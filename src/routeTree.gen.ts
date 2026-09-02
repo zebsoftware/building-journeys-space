@@ -17,6 +17,7 @@ import { Route as JourneysRouteImport } from './routes/journeys'
 import { Route as LearningRouteImport } from './routes/learning'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as StoriesRouteImport } from './routes/stories'
+import { Route as WriteRouteImport } from './routes/write'
 import { Route as PostSlugRouteImport } from './routes/post.$slug'
 
 const IndexRoute = IndexRouteImport.update({
@@ -59,6 +60,11 @@ const StoriesRoute = StoriesRouteImport.update({
   path: '/stories',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WriteRoute = WriteRouteImport.update({
+  id: '/write',
+  path: '/write',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PostSlugRoute = PostSlugRouteImport.update({
   id: '/post/$slug',
   path: '/post/$slug',
@@ -74,6 +80,7 @@ export interface FileRoutesByFullPath {
   '/learning': typeof LearningRoute
   '/search': typeof SearchRoute
   '/stories': typeof StoriesRoute
+  '/write': typeof WriteRoute
   '/post/$slug': typeof PostSlugRoute
 }
 export interface FileRoutesByTo {
@@ -85,6 +92,7 @@ export interface FileRoutesByTo {
   '/learning': typeof LearningRoute
   '/search': typeof SearchRoute
   '/stories': typeof StoriesRoute
+  '/write': typeof WriteRoute
   '/post/$slug': typeof PostSlugRoute
 }
 export interface FileRoutesById {
@@ -97,6 +105,7 @@ export interface FileRoutesById {
   '/learning': typeof LearningRoute
   '/search': typeof SearchRoute
   '/stories': typeof StoriesRoute
+  '/write': typeof WriteRoute
   '/post/$slug': typeof PostSlugRoute
 }
 export interface FileRouteTypes {
@@ -110,6 +119,7 @@ export interface FileRouteTypes {
     | '/learning'
     | '/search'
     | '/stories'
+    | '/write'
     | '/post/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -121,6 +131,7 @@ export interface FileRouteTypes {
     | '/learning'
     | '/search'
     | '/stories'
+    | '/write'
     | '/post/$slug'
   id:
     | '__root__'
@@ -132,6 +143,7 @@ export interface FileRouteTypes {
     | '/learning'
     | '/search'
     | '/stories'
+    | '/write'
     | '/post/$slug'
   fileRoutesById: FileRoutesById
 }
@@ -144,6 +156,7 @@ export interface RootRouteChildren {
   LearningRoute: typeof LearningRoute
   SearchRoute: typeof SearchRoute
   StoriesRoute: typeof StoriesRoute
+  WriteRoute: typeof WriteRoute
   PostSlugRoute: typeof PostSlugRoute
 }
 
@@ -205,6 +218,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StoriesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/write': {
+      id: '/write'
+      path: '/write'
+      fullPath: '/write'
+      preLoaderRoute: typeof WriteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/post/$slug': {
       id: '/post/$slug'
       path: '/post/$slug'
@@ -224,6 +244,7 @@ const rootRouteChildren: RootRouteChildren = {
   LearningRoute: LearningRoute,
   SearchRoute: SearchRoute,
   StoriesRoute: StoriesRoute,
+  WriteRoute: WriteRoute,
   PostSlugRoute: PostSlugRoute,
 }
 export const routeTree = rootRouteImport
