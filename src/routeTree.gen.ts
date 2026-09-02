@@ -15,6 +15,7 @@ import { Route as IdeasRouteImport } from './routes/ideas'
 import { Route as JourneysRouteImport } from './routes/journeys'
 import { Route as LearningRouteImport } from './routes/learning'
 import { Route as StoriesRouteImport } from './routes/stories'
+import { Route as PostSlugRouteImport } from './routes/post.$slug'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -46,6 +47,11 @@ const StoriesRoute = StoriesRouteImport.update({
   path: '/stories',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PostSlugRoute = PostSlugRouteImport.update({
+  id: '/post/$slug',
+  path: '/post/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -54,6 +60,7 @@ export interface FileRoutesByFullPath {
   '/journeys': typeof JourneysRoute
   '/learning': typeof LearningRoute
   '/stories': typeof StoriesRoute
+  '/post/$slug': typeof PostSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -62,6 +69,7 @@ export interface FileRoutesByTo {
   '/journeys': typeof JourneysRoute
   '/learning': typeof LearningRoute
   '/stories': typeof StoriesRoute
+  '/post/$slug': typeof PostSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -71,13 +79,27 @@ export interface FileRoutesById {
   '/journeys': typeof JourneysRoute
   '/learning': typeof LearningRoute
   '/stories': typeof StoriesRoute
+  '/post/$slug': typeof PostSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/creativity' | '/ideas' | '/journeys' | '/learning' | '/stories'
+    | '/'
+    | '/creativity'
+    | '/ideas'
+    | '/journeys'
+    | '/learning'
+    | '/stories'
+    | '/post/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/creativity' | '/ideas' | '/journeys' | '/learning' | '/stories'
+  to:
+    | '/'
+    | '/creativity'
+    | '/ideas'
+    | '/journeys'
+    | '/learning'
+    | '/stories'
+    | '/post/$slug'
   id:
     | '__root__'
     | '/'
@@ -86,6 +108,7 @@ export interface FileRouteTypes {
     | '/journeys'
     | '/learning'
     | '/stories'
+    | '/post/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -95,6 +118,7 @@ export interface RootRouteChildren {
   JourneysRoute: typeof JourneysRoute
   LearningRoute: typeof LearningRoute
   StoriesRoute: typeof StoriesRoute
+  PostSlugRoute: typeof PostSlugRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -141,6 +165,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StoriesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/post/$slug': {
+      id: '/post/$slug'
+      path: '/post/$slug'
+      fullPath: '/post/$slug'
+      preLoaderRoute: typeof PostSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -151,6 +182,7 @@ const rootRouteChildren: RootRouteChildren = {
   JourneysRoute: JourneysRoute,
   LearningRoute: LearningRoute,
   StoriesRoute: StoriesRoute,
+  PostSlugRoute: PostSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
