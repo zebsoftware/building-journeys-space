@@ -14,6 +14,7 @@ import { Route as CreativityRouteImport } from './routes/creativity'
 import { Route as IdeasRouteImport } from './routes/ideas'
 import { Route as JourneysRouteImport } from './routes/journeys'
 import { Route as LearningRouteImport } from './routes/learning'
+import { Route as SearchRouteImport } from './routes/search'
 import { Route as StoriesRouteImport } from './routes/stories'
 import { Route as PostSlugRouteImport } from './routes/post.$slug'
 
@@ -42,6 +43,11 @@ const LearningRoute = LearningRouteImport.update({
   path: '/learning',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SearchRoute = SearchRouteImport.update({
+  id: '/search',
+  path: '/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const StoriesRoute = StoriesRouteImport.update({
   id: '/stories',
   path: '/stories',
@@ -59,6 +65,7 @@ export interface FileRoutesByFullPath {
   '/ideas': typeof IdeasRoute
   '/journeys': typeof JourneysRoute
   '/learning': typeof LearningRoute
+  '/search': typeof SearchRoute
   '/stories': typeof StoriesRoute
   '/post/$slug': typeof PostSlugRoute
 }
@@ -68,6 +75,7 @@ export interface FileRoutesByTo {
   '/ideas': typeof IdeasRoute
   '/journeys': typeof JourneysRoute
   '/learning': typeof LearningRoute
+  '/search': typeof SearchRoute
   '/stories': typeof StoriesRoute
   '/post/$slug': typeof PostSlugRoute
 }
@@ -78,6 +86,7 @@ export interface FileRoutesById {
   '/ideas': typeof IdeasRoute
   '/journeys': typeof JourneysRoute
   '/learning': typeof LearningRoute
+  '/search': typeof SearchRoute
   '/stories': typeof StoriesRoute
   '/post/$slug': typeof PostSlugRoute
 }
@@ -89,6 +98,7 @@ export interface FileRouteTypes {
     | '/ideas'
     | '/journeys'
     | '/learning'
+    | '/search'
     | '/stories'
     | '/post/$slug'
   fileRoutesByTo: FileRoutesByTo
@@ -98,6 +108,7 @@ export interface FileRouteTypes {
     | '/ideas'
     | '/journeys'
     | '/learning'
+    | '/search'
     | '/stories'
     | '/post/$slug'
   id:
@@ -107,6 +118,7 @@ export interface FileRouteTypes {
     | '/ideas'
     | '/journeys'
     | '/learning'
+    | '/search'
     | '/stories'
     | '/post/$slug'
   fileRoutesById: FileRoutesById
@@ -117,6 +129,7 @@ export interface RootRouteChildren {
   IdeasRoute: typeof IdeasRoute
   JourneysRoute: typeof JourneysRoute
   LearningRoute: typeof LearningRoute
+  SearchRoute: typeof SearchRoute
   StoriesRoute: typeof StoriesRoute
   PostSlugRoute: typeof PostSlugRoute
 }
@@ -158,6 +171,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LearningRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/search': {
+      id: '/search'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof SearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/stories': {
       id: '/stories'
       path: '/stories'
@@ -181,6 +201,7 @@ const rootRouteChildren: RootRouteChildren = {
   IdeasRoute: IdeasRoute,
   JourneysRoute: JourneysRoute,
   LearningRoute: LearningRoute,
+  SearchRoute: SearchRoute,
   StoriesRoute: StoriesRoute,
   PostSlugRoute: PostSlugRoute,
 }
