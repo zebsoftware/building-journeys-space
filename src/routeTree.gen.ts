@@ -10,11 +10,35 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as CreativityRouteImport } from './routes/creativity'
+import { Route as IdeasRouteImport } from './routes/ideas'
+import { Route as JourneysRouteImport } from './routes/journeys'
+import { Route as LearningRouteImport } from './routes/learning'
 import { Route as StoriesRouteImport } from './routes/stories'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CreativityRoute = CreativityRouteImport.update({
+  id: '/creativity',
+  path: '/creativity',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IdeasRoute = IdeasRouteImport.update({
+  id: '/ideas',
+  path: '/ideas',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JourneysRoute = JourneysRouteImport.update({
+  id: '/journeys',
+  path: '/journeys',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LearningRoute = LearningRouteImport.update({
+  id: '/learning',
+  path: '/learning',
   getParentRoute: () => rootRouteImport,
 } as any)
 const StoriesRoute = StoriesRouteImport.update({
@@ -25,27 +49,51 @@ const StoriesRoute = StoriesRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/creativity': typeof CreativityRoute
+  '/ideas': typeof IdeasRoute
+  '/journeys': typeof JourneysRoute
+  '/learning': typeof LearningRoute
   '/stories': typeof StoriesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/creativity': typeof CreativityRoute
+  '/ideas': typeof IdeasRoute
+  '/journeys': typeof JourneysRoute
+  '/learning': typeof LearningRoute
   '/stories': typeof StoriesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/creativity': typeof CreativityRoute
+  '/ideas': typeof IdeasRoute
+  '/journeys': typeof JourneysRoute
+  '/learning': typeof LearningRoute
   '/stories': typeof StoriesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/stories'
+  fullPaths:
+    '/' | '/creativity' | '/ideas' | '/journeys' | '/learning' | '/stories'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/stories'
-  id: '__root__' | '/' | '/stories'
+  to: '/' | '/creativity' | '/ideas' | '/journeys' | '/learning' | '/stories'
+  id:
+    | '__root__'
+    | '/'
+    | '/creativity'
+    | '/ideas'
+    | '/journeys'
+    | '/learning'
+    | '/stories'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CreativityRoute: typeof CreativityRoute
+  IdeasRoute: typeof IdeasRoute
+  JourneysRoute: typeof JourneysRoute
+  LearningRoute: typeof LearningRoute
   StoriesRoute: typeof StoriesRoute
 }
 
@@ -56,6 +104,34 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/creativity': {
+      id: '/creativity'
+      path: '/creativity'
+      fullPath: '/creativity'
+      preLoaderRoute: typeof CreativityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ideas': {
+      id: '/ideas'
+      path: '/ideas'
+      fullPath: '/ideas'
+      preLoaderRoute: typeof IdeasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/journeys': {
+      id: '/journeys'
+      path: '/journeys'
+      fullPath: '/journeys'
+      preLoaderRoute: typeof JourneysRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/learning': {
+      id: '/learning'
+      path: '/learning'
+      fullPath: '/learning'
+      preLoaderRoute: typeof LearningRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/stories': {
@@ -70,6 +146,10 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CreativityRoute: CreativityRoute,
+  IdeasRoute: IdeasRoute,
+  JourneysRoute: JourneysRoute,
+  LearningRoute: LearningRoute,
   StoriesRoute: StoriesRoute,
 }
 export const routeTree = rootRouteImport
