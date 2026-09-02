@@ -34,11 +34,6 @@ function AuthPage() {
     if (user) void navigate({ to: "/" });
   }, [user, navigate]);
 
-  const google = async () => {
-    const { lovable } = await import("@/integrations/lovable");
-    await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin });
-  };
-
   const submit = async () => {
     setBusy(true);
     try {
@@ -132,20 +127,6 @@ function AuthPage() {
             {mode === "signup" ? "Create account" : mode === "reset" ? "Send reset link" : "Sign in"}
           </button>
 
-          {mode !== "reset" ? (
-            <>
-              <div className="flex items-center gap-4 py-2 text-xs text-inksoft">
-                <span className="h-px flex-1 bg-line" /> or <span className="h-px flex-1 bg-line" />
-              </div>
-              <button
-                type="button"
-                onClick={() => void google()}
-                className="w-full rounded-full border border-line px-6 py-3 text-sm transition-colors hover:bg-muted"
-              >
-                Continue with Google
-              </button>
-            </>
-          ) : null}
         </div>
 
         <div className="mt-8 flex flex-col gap-2 text-sm text-inksoft">
