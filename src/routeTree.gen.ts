@@ -17,6 +17,7 @@ import { Route as CreativityRouteImport } from './routes/creativity'
 import { Route as IdeasRouteImport } from './routes/ideas'
 import { Route as JourneysRouteImport } from './routes/journeys'
 import { Route as LearningRouteImport } from './routes/learning'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as StoriesRouteImport } from './routes/stories'
 import { Route as WriteRouteImport } from './routes/write'
@@ -64,6 +65,11 @@ const LearningRoute = LearningRouteImport.update({
   path: '/learning',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SearchRoute = SearchRouteImport.update({
   id: '/search',
   path: '/search',
@@ -104,6 +110,7 @@ export interface FileRoutesByFullPath {
   '/ideas': typeof IdeasRoute
   '/journeys': typeof JourneysRoute
   '/learning': typeof LearningRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/search': typeof SearchRoute
   '/stories': typeof StoriesRoute
   '/write': typeof WriteRoute
@@ -120,6 +127,7 @@ export interface FileRoutesByTo {
   '/ideas': typeof IdeasRoute
   '/journeys': typeof JourneysRoute
   '/learning': typeof LearningRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/search': typeof SearchRoute
   '/stories': typeof StoriesRoute
   '/write': typeof WriteRoute
@@ -137,6 +145,7 @@ export interface FileRoutesById {
   '/ideas': typeof IdeasRoute
   '/journeys': typeof JourneysRoute
   '/learning': typeof LearningRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/search': typeof SearchRoute
   '/stories': typeof StoriesRoute
   '/write': typeof WriteRoute
@@ -155,6 +164,7 @@ export interface FileRouteTypes {
     | '/ideas'
     | '/journeys'
     | '/learning'
+    | '/reset-password'
     | '/search'
     | '/stories'
     | '/write'
@@ -171,6 +181,7 @@ export interface FileRouteTypes {
     | '/ideas'
     | '/journeys'
     | '/learning'
+    | '/reset-password'
     | '/search'
     | '/stories'
     | '/write'
@@ -187,6 +198,7 @@ export interface FileRouteTypes {
     | '/ideas'
     | '/journeys'
     | '/learning'
+    | '/reset-password'
     | '/search'
     | '/stories'
     | '/write'
@@ -204,6 +216,7 @@ export interface RootRouteChildren {
   IdeasRoute: typeof IdeasRoute
   JourneysRoute: typeof JourneysRoute
   LearningRoute: typeof LearningRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   SearchRoute: typeof SearchRoute
   StoriesRoute: typeof StoriesRoute
   WriteRoute: typeof WriteRoute
@@ -270,6 +283,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LearningRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/search': {
       id: '/search'
       path: '/search'
@@ -324,6 +344,7 @@ const rootRouteChildren: RootRouteChildren = {
   IdeasRoute: IdeasRoute,
   JourneysRoute: JourneysRoute,
   LearningRoute: LearningRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   SearchRoute: SearchRoute,
   StoriesRoute: StoriesRoute,
   WriteRoute: WriteRoute,
