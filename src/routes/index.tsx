@@ -197,28 +197,20 @@ function Index() {
         </section>
       ) : null}
 
-      {/* About */}
+      {/* Reflect */}
       <section>
         <Container className="py-20">
-          <div className="rise rounded-2xl bg-inverse px-8 py-16 text-inverse-foreground sm:px-14 sm:py-20">
-            <h2 className="font-display text-4xl font-medium tracking-tight sm:text-5xl">The Founder</h2>
-            <p className="mt-5 max-w-[34ch] text-lg leading-relaxed opacity-75">
-              Everyone is building something. A place for the process, not just the finish line.
+          <div className="rounded-2xl bg-inverse px-8 py-16 text-center text-inverse-foreground">
+            <p className="text-[11px] uppercase tracking-[0.22em] opacity-70">A prompt to sit with</p>
+            <p className="mx-auto mt-6 max-w-[24ch] font-display text-3xl leading-snug sm:text-4xl">
+              What are you building that nobody sees yet?
             </p>
-            <div className="mt-10 flex flex-wrap gap-x-8 gap-y-3 text-sm">
-              <Link to="/write" className="underline-link inline-flex items-center gap-2 opacity-80 transition-opacity hover:opacity-100">
-                Start Writing <ArrowRight className="size-4" />
-              </Link>
-              <Link to="/search" className="underline-link opacity-80 transition-opacity hover:opacity-100">
-                Search
-              </Link>
-              <Link to="/stories" className="underline-link opacity-80 transition-opacity hover:opacity-100">
-                Stories
-              </Link>
-              <Link to="/journeys" className="underline-link opacity-80 transition-opacity hover:opacity-100">
-                Journeys
-              </Link>
-            </div>
+            <Link
+              to="/write"
+              className="mt-9 inline-flex items-center gap-2 rounded-full bg-background px-6 py-3 text-sm text-foreground transition-opacity hover:opacity-90"
+            >
+              Write your answer <ArrowRight className="size-4" />
+            </Link>
           </div>
         </Container>
       </section>
