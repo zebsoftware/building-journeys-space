@@ -1,4 +1,3 @@
-import { Link } from "@tanstack/react-router";
 import { Facebook, Instagram, Twitter } from "lucide-react";
 
 function TikTokIcon({ className }: { className?: string }) {
@@ -19,35 +18,20 @@ const SOCIALS = [
 export function Footer() {
   return (
     <footer className="border-t border-line">
-      <div className="mx-auto flex max-w-[1200px] flex-col gap-8 px-6 py-14 sm:flex-row sm:items-end sm:justify-between">
-        <div className="flex flex-wrap gap-x-8 gap-y-2 text-sm">
-          <Link to="/write" className="underline-link text-foreground">
-            Start Writing
-          </Link>
-          <Link to="/search" className="underline-link text-foreground">
-            Search
-          </Link>
-          <Link to="/stories" className="underline-link text-foreground">
-            Stories
-          </Link>
-          <Link to="/journeys" className="underline-link text-foreground">
-            Journeys
-          </Link>
-        </div>
-        <div className="flex items-center gap-3">
-          {SOCIALS.map(({ label, href, Icon }) => (
-            <a
-              key={label}
-              href={href}
-              target="_blank"
-              rel="noreferrer"
-              aria-label={label}
-              className="flex size-10 items-center justify-center rounded-full border border-foreground/20 text-foreground transition-colors hover:bg-muted"
-            >
-              <Icon className="size-5" />
-            </a>
-          ))}
-        </div>
+      <div className="mx-auto grid max-w-[1200px] grid-cols-2 gap-3 px-6 py-8 sm:grid-cols-4">
+        {SOCIALS.map(({ label, href, Icon }) => (
+          <a
+            key={label}
+            href={href}
+            target="_blank"
+            rel="noreferrer"
+            aria-label={label}
+            className="group flex flex-col items-center justify-center gap-2 rounded-lg border border-foreground/20 bg-muted/30 py-8 text-foreground transition-colors hover:bg-muted"
+          >
+            <Icon className="size-6 transition-transform group-hover:scale-110" />
+            <span className="text-sm font-medium">{label}</span>
+          </a>
+        ))}
       </div>
       <div className="border-t border-line">
         <div className="mx-auto flex max-w-[1200px] items-center px-6 py-5 text-xs text-foreground">
