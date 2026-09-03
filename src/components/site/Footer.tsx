@@ -1,4 +1,12 @@
 import { Link } from "@tanstack/react-router";
+import { Github, Instagram, Linkedin, Twitter } from "lucide-react";
+
+const SOCIALS = [
+  { label: "Twitter / X", href: "https://twitter.com", Icon: Twitter },
+  { label: "Instagram", href: "https://instagram.com", Icon: Instagram },
+  { label: "LinkedIn", href: "https://linkedin.com", Icon: Linkedin },
+  { label: "GitHub", href: "https://github.com", Icon: Github },
+];
 
 export function Footer() {
   return (
