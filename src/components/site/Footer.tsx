@@ -18,25 +18,41 @@ export function Footer() {
             Everyone is building something. A place for the process, not just the finish line.
           </p>
         </div>
-        <div className="flex flex-wrap gap-x-8 gap-y-2 text-sm">
-          <Link to="/write" className="underline-link text-inksoft">
-            Start Writing
-          </Link>
-          <Link to="/search" className="underline-link text-inksoft">
-            Search
-          </Link>
-          <Link to="/stories" className="underline-link text-inksoft">
-            Stories
-          </Link>
-          <Link to="/journeys" className="underline-link text-inksoft">
-            Journeys
-          </Link>
+        <div className="flex flex-col gap-5 sm:items-end">
+          <div className="flex flex-wrap gap-x-8 gap-y-2 text-sm">
+            <Link to="/write" className="underline-link text-inksoft">
+              Start Writing
+            </Link>
+            <Link to="/search" className="underline-link text-inksoft">
+              Search
+            </Link>
+            <Link to="/stories" className="underline-link text-inksoft">
+              Stories
+            </Link>
+            <Link to="/journeys" className="underline-link text-inksoft">
+              Journeys
+            </Link>
+          </div>
+          <div className="flex items-center gap-3">
+            {SOCIALS.map(({ label, href, Icon }) => (
+              <a
+                key={label}
+                href={href}
+                target="_blank"
+                rel="noreferrer"
+                aria-label={label}
+                className="flex size-9 items-center justify-center rounded-full border border-line text-inksoft transition-colors hover:bg-muted hover:text-foreground"
+              >
+                <Icon className="size-4" />
+              </a>
+            ))}
+          </div>
         </div>
       </div>
       <div className="border-t border-line">
         <div className="mx-auto flex max-w-[1200px] items-center justify-between px-6 py-5 text-xs text-inksoft">
           <span>© {new Date().getFullYear()} The Founder. Made for the process.</span>
-          <span className="uppercase tracking-[0.15em]">Issue No. 01</span>
+          <span className="uppercase tracking-[0.15em]">For the process, not the finish line</span>
         </div>
       </div>
     </footer>
