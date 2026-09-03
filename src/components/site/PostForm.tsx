@@ -72,7 +72,10 @@ export function PostForm({ existing }: { existing?: PostRow | null }) {
   }
 
   const save = async (status: "draft" | "published") => {
-    if (!draft.title.trim()) return toast.error("Give your post a title.");
+    if (!draft.title.trim()) {
+      toast.error("Give your post a title.");
+      return;
+    }
     setBusy(true);
     try {
       const payload = {

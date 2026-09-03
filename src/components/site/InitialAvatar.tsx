@@ -1,6 +1,6 @@
 type Props = {
   name: string;
-  url?: string | null;
+  url?: string | null | undefined;
   size?: number;
   className?: string;
 };

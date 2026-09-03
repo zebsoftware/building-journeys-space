@@ -161,7 +161,10 @@ function PostPage() {
               <button
                 type="button"
                 onClick={() => {
-                  if (!user) return toast.error("Sign in to like posts.");
+                  if (!user) {
+                    toast.error("Sign in to like posts.");
+                    return;
+                  }
                   likeMutation.mutate();
                 }}
                 className={`flex items-center gap-2 rounded-full border border-line px-4 py-2 text-xs transition-colors hover:bg-muted ${
@@ -174,7 +177,10 @@ function PostPage() {
               <button
                 type="button"
                 onClick={() => {
-                  if (!user) return toast.error("Sign in to save posts.");
+                  if (!user) {
+                    toast.error("Sign in to save posts.");
+                    return;
+                  }
                   bookmarkMutation.mutate();
                 }}
                 aria-label="Bookmark"
