@@ -72,11 +72,15 @@ export function Header() {
                 <span className="hidden sm:inline">Profile</span>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-52">
-                <DropdownMenuItem asChild>
-                  <Link to="/u/$username" params={{ username: profile?.username ?? "" }}>
-                    My profile
-                  </Link>
-                </DropdownMenuItem>
+                {profile?.username ? (
+                  <DropdownMenuItem asChild>
+                    <Link to="/u/$username" params={{ username: profile.username }}>
+                      My profile
+                    </Link>
+                  </DropdownMenuItem>
+                ) : (
+                  <DropdownMenuItem disabled>Loading profile…</DropdownMenuItem>
+                )}
                 <DropdownMenuItem asChild>
                   <Link to="/bookmarks">Bookmarks</Link>
                 </DropdownMenuItem>
