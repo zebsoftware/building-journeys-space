@@ -33,7 +33,7 @@ function ProfilePage() {
 
   const { data: posts = [] } = useQuery({
     queryKey: ["author-posts", profile?.id, isOwner],
-    queryFn: () => fetchAuthorPosts(profile!.id, isOwner),
+    queryFn: () => (profile ? fetchAuthorPosts(profile.id, isOwner) : Promise.resolve([])),
     enabled: Boolean(profile?.id),
   });
 
