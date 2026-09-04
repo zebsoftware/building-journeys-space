@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useTheme } from "@/lib/theme";
 import { supabase } from "@/integrations/supabase/client";
 import { InitialAvatar } from "@/components/site/InitialAvatar";
+import founderLogo from "@/assets/founder-logo.png.asset.json";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,8 +30,9 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 border-b border-line bg-background/85 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-[1200px] items-center gap-6 px-6">
-        <Link to="/" className="font-display text-xl font-medium tracking-tight">
-          The Founder
+        <Link to="/" className="flex shrink-0 items-center gap-2.5 font-display text-xl font-medium tracking-tight">
+          <img src={founderLogo.url} alt="" className="size-10 rounded-sm object-contain" />
+          <span>The Founder</span>
         </Link>
 
         <nav className="hidden items-center gap-6 text-sm text-inksoft lg:flex">
@@ -65,8 +67,9 @@ export function Header() {
 
           {user ? (
             <DropdownMenu>
-              <DropdownMenuTrigger className="ml-1 rounded-full outline-none ring-offset-2 focus-visible:ring-2 focus-visible:ring-ring">
+              <DropdownMenuTrigger className="ml-1 flex items-center gap-2 rounded-full border border-line py-1 pl-1 pr-3 text-sm outline-none ring-offset-2 transition-colors hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring">
                 <InitialAvatar name={profile?.display_name ?? "You"} url={profile?.avatar_url} size={32} />
+                <span className="hidden sm:inline">Profile</span>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-52">
                 <DropdownMenuItem asChild>
