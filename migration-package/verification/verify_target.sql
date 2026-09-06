@@ -61,11 +61,11 @@ WHERE u.id IS NULL
     '77777777-7777-7777-7777-777777777777'
   );
 
-SELECT p.id, p.slug, p.like_count, count(DISTINCT l.user_id) AS actual_likes,
-       p.comment_count, count(DISTINCT c.id) AS actual_comments
-FROM public.posts p
-LEFT JOIN public.likes l ON l.post_id = p.id
-LEFT JOIN public.comments c ON c.post_id = p.id
-GROUP BY p.id
-HAVING p.like_count <> count(DISTINCT l.user_id)
-    OR p.comment_count <> count(DISTINCT c.id);
+-- Aggregate snapshot. Expected: 14 posts, 29,860 views, 2,585 historical
+-- likes, 0 comments. Historical likes were seeded as aggregate display values
+-- and intentionally do not have matching rows in public.likes.
+SELECT count(*) AS posts,
+       sum(views) AS total_views,
+       sum(like_count) AS total_likes,
+       sum(comment_count) AS total_comments
+FROM public.posts;

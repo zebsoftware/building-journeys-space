@@ -28,8 +28,3 @@ SET LOCAL session_replication_role = replica;
 SET LOCAL session_replication_role = origin;
 
 COMMIT;
-
--- Reconcile counters from their source-of-truth engagement rows.
-UPDATE public.posts p
-SET like_count = (SELECT count(*) FROM public.likes l WHERE l.post_id = p.id),
-    comment_count = (SELECT count(*) FROM public.comments c WHERE c.post_id = p.id);

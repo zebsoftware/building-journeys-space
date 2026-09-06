@@ -11,6 +11,7 @@ This package recreates The Founder's backend in an empty, user-owned Supabase pr
 - Storage buckets: none
 - Authentication used by the app: email and password
 - Source snapshot at packaging time: 8 profiles, 1 role, 14 posts, 0 comments, 0 likes, 0 bookmarks, 0 reports
+- Preserved post metrics: 29,860 views, 2,585 historical likes, 0 comments. Historical likes are aggregate seed values and intentionally do not have matching rows in `likes`.
 
 ## Safety rules
 
@@ -53,7 +54,7 @@ Place the exported CSV files in `data/`, then run:
 psql "$TARGET_DATABASE_URL" -v ON_ERROR_STOP=1 -f scripts/import_public_data.sql
 ```
 
-The script truncates only the seven application tables in the **target**, temporarily suppresses triggers during the load, preserves IDs/timestamps, and restores trigger behavior afterward.
+The script truncates only the seven application tables in the **target**, temporarily suppresses triggers during the load, preserves IDs, timestamps, and historical aggregate counters, and restores trigger behavior afterward.
 
 ## 5. Recreate authentication configuration
 
