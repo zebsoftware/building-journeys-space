@@ -7,7 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useTheme } from "@/lib/theme";
 import { supabase } from "@/integrations/supabase/client";
 import { InitialAvatar } from "@/components/site/InitialAvatar";
-import founderLogo from "@/assets/founder-logo.png.asset.json";
+// import founderLogo from "@/assets/founder-logo.png.asset.json";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -31,7 +31,11 @@ export function Header() {
     <header className="sticky top-0 z-50 border-b border-line bg-background/85 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-[1200px] items-center gap-6 px-6">
         <Link to="/" className="flex shrink-0 items-center gap-2.5 font-display text-xl font-medium tracking-tight">
-          <img src={founderLogo.url} alt="" className="size-10 rounded-sm object-contain" />
+        <img
+  src="/founder-logo.png"
+  alt="The Founder"
+  className="size-10 rounded-sm object-contain"
+/>
           <span>The Founder</span>
         </Link>
 
