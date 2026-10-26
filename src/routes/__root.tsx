@@ -104,7 +104,7 @@ export const Route = createRootRouteWithContext<{
         content: "width=device-width, initial-scale=1",
       },
       {
-        title: "The Founder — Everyone is building something",
+        title: "The Founder — Everyone is creating something",
       },
       {
         name: "description",
@@ -117,11 +117,11 @@ export const Route = createRootRouteWithContext<{
       },
       {
         property: "og:title",
-        content: "The Founder — Everyone is building something",
+        content: "The Founder — Everyone is creating something",
       },
       {
         property: "og:description",
-        content: "Stories, journeys, ideas, creativity and growth from people building in public.",
+        content: "Stories, journeys, ideas, creativity and growth from people creating in public.",
       },
       {
         property: "og:type",
