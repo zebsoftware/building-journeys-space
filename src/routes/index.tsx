@@ -208,16 +208,19 @@ function Index() {
           </div>
           <div className="max-w-[58ch] space-y-5 text-base leading-relaxed text-inksoft">
             <p>
-              Every meaningful thing begins somewhere: a first sentence, an unfinished idea,
-              a lesson learned the difficult way. The Founder is a home for everything
-              between starting and figuring it out.
+              Every meaningful thing begins somewhere: a first sentence, an unfinished idea, a
+              lesson learned the difficult way. The Founder is a home for everything between
+              starting and figuring it out.
             </p>
             <p>
-              You don't need a company, a following, or a perfect success story to belong.
-              If you're writing, learning, making, trying again, or finding your way,
-              your story deserves room to grow.
+              You don't need a company, a following, or a perfect success story to belong. If you're
+              writing, learning, making, trying again, or finding your way, your story deserves room
+              to grow.
             </p>
-            <Link to="/write" className="inline-flex items-center gap-2 pt-2 text-sm font-medium text-foreground underline-link">
+            <Link
+              to="/write"
+              className="inline-flex items-center gap-2 pt-2 text-sm font-medium text-foreground underline-link"
+            >
               Share your story <ArrowRight className="size-4" />
             </Link>
           </div>
