@@ -6,6 +6,7 @@ import { toast } from "sonner";
 
 import { Container, SiteLayout } from "@/components/site/SiteLayout";
 import { InitialAvatar } from "@/components/site/InitialAvatar";
+import { SafeArticle } from "@/components/site/SafeArticle";
 import { PostRowItem } from "@/components/site/PostCard";
 import { useAuth } from "@/hooks/useAuth";
 import { categoryLabel } from "@/lib/categories";
@@ -214,7 +215,7 @@ function PostPage() {
             </p>
           ) : null}
 
-          <div className="article-body mt-8" dangerouslySetInnerHTML={{ __html: post.content }} />
+          <SafeArticle html={post.content} />
 
           {post.tags?.length ? (
             <div className="mt-10 flex flex-wrap gap-2">
