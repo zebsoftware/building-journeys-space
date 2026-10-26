@@ -35,6 +35,23 @@ function AdminPage() {
   const { isAdmin, loading, user } = useAuth();
   const qc = useQueryClient();
 
+  const { data: siteStats } = useQuery({
+    queryKey: ["admin-stats"],
+    enabled: isAdmin,
+    queryFn: async () => {
+      const [all, published, openReports, views] = await Promise.all([
+        supabase.from("posts").select("id", { count: "exact", head: true }),
+        supabase.from("posts").select("id", { count: "exact", head: true }).eq("status", "published"),
+        supabase.from("reports").select("id", { count: "exact", head: true }).eq("resolved", false),
+        supabase.from("posts").select("views"),
+      ]);
+      for (const result of [all, published, openReports, views]) if (result.error) throw result.error;
+      return { posts: all.count ?? 0, published: published.count ?? 0,
+        openReports: openReports.count ?? 0,
+        views: (views.data ?? []).reduce((total, row) => total + (row.views ?? 0), 0) };
+    },
+  });
+
   const { data: posts = [] } = useQuery({
     queryKey: ["admin-posts"],
     queryFn: async () => {
@@ -69,6 +86,7 @@ function AdminPage() {
     },
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ["admin-posts"] });
+      void qc.invalidateQueries({ queryKey: ["admin-stats"] });
       toast.success("Post updated");
     },
     onError: () => toast.error("Couldn't update the post."),
@@ -76,6 +94,7 @@ function AdminPage() {
 
   const removePost = useMutation({
     mutationFn: async (id: string) => {
+      if (!window.confirm("Permanently delete this post and its comments?")) return;
       const { error } = await supabase.from("posts").delete().eq("id", id);
       if (error) throw error;
     },
@@ -90,7 +109,10 @@ function AdminPage() {
       const { error } = await supabase.from("reports").update({ resolved: true }).eq("id", id);
       if (error) throw error;
     },
-    onSuccess: () => void qc.invalidateQueries({ queryKey: ["admin-reports"] }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["admin-reports"] });
+      void qc.invalidateQueries({ queryKey: ["admin-stats"] });
+    },
   });
 
   if (loading) {
@@ -115,8 +137,7 @@ function AdminPage() {
     );
   }
 
-  const published = posts.filter((post) => post.status === "published").length;
-  const totalViews = posts.reduce((sum, post) => sum + (post.views ?? 0), 0);
+  
 
   return (
     <SiteLayout>
@@ -125,10 +146,10 @@ function AdminPage() {
 
         <div className="mt-8 grid gap-px overflow-hidden rounded-2xl border border-line bg-line sm:grid-cols-4">
           {[
-            { label: "Posts", value: posts.length },
-            { label: "Published", value: published },
-            { label: "Views", value: compactNumber(totalViews) },
-            { label: "Open reports", value: reports.filter((report) => !report.resolved).length },
+            { label: "Posts", value: siteStats?.posts ?? "…" },
+            { label: "Published", value: siteStats?.published ?? "…" },
+            { label: "Views", value: siteStats ? compactNumber(siteStats.views) : "…" },
+            { label: "Open reports", value: siteStats?.openReports ?? "…" },
           ].map((stat) => (
             <div key={stat.label} className="bg-background p-6">
               <p className="font-display text-3xl">{stat.value}</p>
