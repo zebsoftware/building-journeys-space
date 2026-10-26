@@ -92,7 +92,6 @@ function AdminPage() {
 
   const removePost = useMutation({
     mutationFn: async (id: string) => {
-      if (!window.confirm("Permanently delete this post and its comments?")) return;
       const { error } = await supabase.from("posts").delete().eq("id", id);
       if (error) throw error;
     },
@@ -204,7 +203,7 @@ function AdminPage() {
                     </button>
                     <button
                       type="button"
-                      onClick={() => removePost.mutate(post.id)}
+                      onClick={() => { if (window.confirm("Permanently delete this post and its comments?")) removePost.mutate(post.id); }}
                       className="rounded-full border border-line px-3 py-1.5 text-xs text-destructive hover:bg-muted"
                     >
                       Delete
