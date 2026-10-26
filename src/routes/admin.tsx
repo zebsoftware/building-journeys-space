@@ -39,16 +39,14 @@ function AdminPage() {
     queryKey: ["admin-stats"],
     enabled: isAdmin,
     queryFn: async () => {
-      const [all, published, openReports, views] = await Promise.all([
-        supabase.from("posts").select("id", { count: "exact", head: true }),
-        supabase.from("posts").select("id", { count: "exact", head: true }).eq("status", "published"),
-        supabase.from("reports").select("id", { count: "exact", head: true }).eq("resolved", false),
-        supabase.from("posts").select("views"),
-      ]);
-      for (const result of [all, published, openReports, views]) if (result.error) throw result.error;
-      return { posts: all.count ?? 0, published: published.count ?? 0,
-        openReports: openReports.count ?? 0,
-        views: (views.data ?? []).reduce((total, row) => total + (row.views ?? 0), 0) };
+      const { data, error } = await supabase.rpc("admin_site_stats" as never);
+      if (error) throw error;
+      const stats = (data as unknown as Array<{
+        total_posts: number; published_posts: number; total_views: number; open_reports: number;
+      }>)?.[0];
+      if (!stats) throw new Error("Admin statistics unavailable. Apply the latest Supabase migrations.");
+      return { posts: Number(stats.total_posts), published: Number(stats.published_posts),
+        views: Number(stats.total_views), openReports: Number(stats.open_reports) };
     },
   });
 
