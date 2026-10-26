@@ -11,13 +11,13 @@ import { fetchPosts } from "@/lib/posts";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "The Founder — Everyone is building something" },
+      { title: "The Founder — Everyone is creating something" },
       {
         name: "description",
         content:
-          "Read and write honest stories, journeys, ideas, creative work and lessons from people building something.",
+          "Read and write honest stories, journeys, ideas, creative work and lessons from people creating something.",
       },
-      { property: "og:title", content: "The Founder — Everyone is building something" },
+      { property: "og:title", content: "The Founder — Everyone is creating something" },
       {
         property: "og:description",
         content: "A warm, editorial community for the process, not just the finish line.",
@@ -54,7 +54,7 @@ function Index() {
         <Container className="grid gap-12 py-16 lg:grid-cols-[1.05fr_1fr] lg:items-center lg:py-24">
           <div className="rise">
             <h1 className="font-display text-5xl leading-[1.05] tracking-tight sm:text-6xl">
-              Everyone is building something.
+              Everyone is creating something.
             </h1>
             <p className="mt-6 max-w-[46ch] text-lg leading-relaxed text-inksoft">
               The Founder is a home for the honest middle of the work — the stories, journeys, ideas
@@ -197,6 +197,33 @@ function Index() {
         </section>
       ) : null}
 
+      {/* About The Founder */}
+      <section id="about" className="border-b border-line bg-card">
+        <Container className="grid gap-10 py-20 lg:grid-cols-[0.7fr_1.3fr] lg:gap-20">
+          <div>
+            <p className="text-[11px] uppercase tracking-[0.22em] text-ember">Our purpose</p>
+            <h2 className="mt-4 font-display text-4xl leading-tight tracking-tight sm:text-5xl">
+              Not just for founders. For everyone becoming.
+            </h2>
+          </div>
+          <div className="max-w-[58ch] space-y-5 text-base leading-relaxed text-inksoft">
+            <p>
+              Every meaningful thing begins somewhere: a first sentence, an unfinished idea,
+              a lesson learned the difficult way. The Founder is a home for everything
+              between starting and figuring it out.
+            </p>
+            <p>
+              You don't need a company, a following, or a perfect success story to belong.
+              If you're writing, learning, making, trying again, or finding your way,
+              your story deserves room to grow.
+            </p>
+            <Link to="/write" className="inline-flex items-center gap-2 pt-2 text-sm font-medium text-foreground underline-link">
+              Share your story <ArrowRight className="size-4" />
+            </Link>
+          </div>
+        </Container>
+      </section>
+
       {/* Reflect */}
       <section>
         <Container className="py-20">
@@ -205,7 +232,7 @@ function Index() {
               A prompt to sit with
             </p>
             <p className="mx-auto mt-6 max-w-[24ch] font-display text-3xl leading-snug sm:text-4xl">
-              What are you building that nobody sees yet?
+              What are you creating that nobody sees yet?
             </p>
             <Link
               to="/write"
