@@ -50,19 +50,18 @@ function AuthPage() {
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
-          options: { emailRedirectTo: window.location.origin },
+          options: {
+            emailRedirectTo: window.location.origin,
+            data: { display_name: displayName.trim() || email.split("@")[0] },
+          },
         });
         if (error) throw error;
-        const id = data.user?.id;
-        if (id) {
-          const base = slugify(displayName || email.split("@")[0]!).slice(0, 24);
-          await supabase.from("profiles").insert({
-            id,
-            username: `${base}-${id.slice(0, 4)}`,
-            display_name: displayName || email.split("@")[0]!,
-          });
-        }
-        toast.success("Account created. Welcome to The Founder.");
+        // The database signup trigger creates the profile; don't insert it twice.
+        toast.success(
+          data.session
+            ? "Account created. Welcome to The Founder."
+            : "Check your email to finish creating your account.",
+        );
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
@@ -88,7 +87,7 @@ function AuthPage() {
         <p className="mt-3 text-sm leading-relaxed text-inksoft">
           {mode === "reset"
             ? "We'll email you a link to choose a new password."
-            : "Everyone is building something. Bring yours here."}
+            : "Everyone is creating something. Bring yours here."}
         </p>
 
         <div className="mt-8 space-y-4">
