@@ -13,7 +13,6 @@ const QUICK_LINKS = [
   { label: "Home", to: "/" },
   { label: "Stories", to: "/stories" },
   { label: "Journeys", to: "/journeys" },
-  { label: "About", to: "/ideas" },
 ] as const;
 
 // Add your real social profile URLs here later.
