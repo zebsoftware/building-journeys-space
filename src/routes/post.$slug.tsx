@@ -129,8 +129,12 @@ function PostPage() {
     <SiteLayout>
       <article>
         <Container className="max-w-[760px] py-14">
-          <p className="text-[11px] uppercase tracking-[0.2em] text-ember">{categoryLabel(post.category)}</p>
-          <h1 className="mt-5 font-display text-4xl leading-tight tracking-tight sm:text-5xl">{post.title}</h1>
+          <p className="text-[11px] uppercase tracking-[0.2em] text-ember">
+            {categoryLabel(post.category)}
+          </p>
+          <h1 className="mt-5 font-display text-4xl leading-tight tracking-tight sm:text-5xl">
+            {post.title}
+          </h1>
           {post.subtitle ? (
             <p className="mt-5 text-xl leading-relaxed text-inksoft">{post.subtitle}</p>
           ) : null}
@@ -141,7 +145,11 @@ function PostPage() {
               params={{ username: post.author?.username ?? "" }}
               className="flex items-center gap-3"
             >
-              <InitialAvatar name={post.author?.display_name ?? "Anonymous"} url={post.author?.avatar_url} size={40} />
+              <InitialAvatar
+                name={post.author?.display_name ?? "Anonymous"}
+                url={post.author?.avatar_url}
+                size={40}
+              />
               <span>
                 <span className="block text-sm">{post.author?.display_name ?? "Anonymous"}</span>
                 <span className="block text-xs text-inksoft">

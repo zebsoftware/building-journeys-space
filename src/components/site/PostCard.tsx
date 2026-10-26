@@ -49,7 +49,9 @@ export function PostCard({ post, featured = false }: { post: PostRow; featured?:
           </div>
         ) : null}
         <div className={cover ? "pt-5" : ""}>
-          <p className="text-[11px] uppercase tracking-[0.18em] text-ember">{categoryLabel(post.category)}</p>
+          <p className="text-[11px] uppercase tracking-[0.18em] text-ember">
+            {categoryLabel(post.category)}
+          </p>
           <h3
             className={`mt-2 font-display font-medium leading-snug ${featured ? "text-3xl" : "text-xl"}`}
           >
@@ -98,7 +100,12 @@ export function CreativityCard({ post }: { post: PostRow }) {
       <Link to="/post/$slug" params={{ slug: post.slug }}>
         {cover ? (
           <div className="overflow-hidden rounded-xl bg-muted">
-            <img src={cover} alt={post.title} loading="lazy" className="zoom-media w-full object-cover" />
+            <img
+              src={cover}
+              alt={post.title}
+              loading="lazy"
+              className="zoom-media w-full object-cover"
+            />
           </div>
         ) : null}
         <h3 className="mt-3 font-display text-lg font-medium leading-snug">{post.title}</h3>
@@ -113,7 +120,9 @@ export function PostRowItem({ post }: { post: PostRow }) {
     <article className="group border-b border-line py-6 last:border-b-0">
       <Link to="/post/$slug" params={{ slug: post.slug }} className="flex gap-6">
         <div className="min-w-0 flex-1">
-          <p className="text-[11px] uppercase tracking-[0.18em] text-ember">{categoryLabel(post.category)}</p>
+          <p className="text-[11px] uppercase tracking-[0.18em] text-ember">
+            {categoryLabel(post.category)}
+          </p>
           <h3 className="mt-2 font-display text-xl font-medium leading-snug">{post.title}</h3>
           <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-inksoft">
             {post.subtitle || excerptFrom(post.content)}

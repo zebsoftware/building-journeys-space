@@ -24,7 +24,11 @@ function EditPage() {
   const { data, isLoading } = useQuery({
     queryKey: ["post-edit", id],
     queryFn: async () => {
-      const { data: row, error } = await supabase.from("posts").select("*").eq("id", id).maybeSingle();
+      const { data: row, error } = await supabase
+        .from("posts")
+        .select("*")
+        .eq("id", id)
+        .maybeSingle();
       if (error) throw error;
       return (row as unknown as PostRow) ?? null;
     },

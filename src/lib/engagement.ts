@@ -14,7 +14,9 @@ export type CommentRow = {
 export async function fetchComments(postId: string): Promise<CommentRow[]> {
   const { data, error } = await supabase
     .from("comments")
-    .select("id,post_id,parent_id,author_id,body,created_at,author:profiles(id,username,display_name,avatar_url,bio)")
+    .select(
+      "id,post_id,parent_id,author_id,body,created_at,author:profiles(id,username,display_name,avatar_url,bio)",
+    )
     .eq("post_id", postId)
     .order("created_at", { ascending: true });
   if (error) throw error;
@@ -44,15 +46,29 @@ export async function deleteComment(id: string) {
 export async function fetchEngagement(postId: string, userId: string | null) {
   if (!userId) return { liked: false, bookmarked: false };
   const [{ data: like }, { data: bookmark }] = await Promise.all([
-    supabase.from("likes").select("post_id").eq("post_id", postId).eq("user_id", userId).maybeSingle(),
-    supabase.from("bookmarks").select("post_id").eq("post_id", postId).eq("user_id", userId).maybeSingle(),
+    supabase
+      .from("likes")
+      .select("post_id")
+      .eq("post_id", postId)
+      .eq("user_id", userId)
+      .maybeSingle(),
+    supabase
+      .from("bookmarks")
+      .select("post_id")
+      .eq("post_id", postId)
+      .eq("user_id", userId)
+      .maybeSingle(),
   ]);
   return { liked: Boolean(like), bookmarked: Boolean(bookmark) };
 }
 
 export async function toggleLike(postId: string, userId: string, liked: boolean) {
   if (liked) {
-    const { error } = await supabase.from("likes").delete().eq("post_id", postId).eq("user_id", userId);
+    const { error } = await supabase
+      .from("likes")
+      .delete()
+      .eq("post_id", postId)
+      .eq("user_id", userId);
     if (error) throw error;
   } else {
     const { error } = await supabase.from("likes").insert({ post_id: postId, user_id: userId });
@@ -62,7 +78,11 @@ export async function toggleLike(postId: string, userId: string, liked: boolean)
 
 export async function toggleBookmark(postId: string, userId: string, bookmarked: boolean) {
   if (bookmarked) {
-    const { error } = await supabase.from("bookmarks").delete().eq("post_id", postId).eq("user_id", userId);
+    const { error } = await supabase
+      .from("bookmarks")
+      .delete()
+      .eq("post_id", postId)
+      .eq("user_id", userId);
     if (error) throw error;
   } else {
     const { error } = await supabase.from("bookmarks").insert({ post_id: postId, user_id: userId });

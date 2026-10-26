@@ -12,7 +12,10 @@ export const Route = createFileRoute("/search")({
   head: () => ({
     meta: [
       { title: "Search — The Founder" },
-      { name: "description", content: "Search stories, journeys, ideas, creative work and lessons on The Founder." },
+      {
+        name: "description",
+        content: "Search stories, journeys, ideas, creative work and lessons on The Founder.",
+      },
       { property: "og:title", content: "Search — The Founder" },
       { property: "og:description", content: "Find the writing you're looking for." },
     ],

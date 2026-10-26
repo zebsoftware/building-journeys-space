@@ -8,7 +8,8 @@ export const Route = createFileRoute("/stories")({
       { title: "Stories — The Founder" },
       {
         name: "description",
-        content: "Real experiences and memorable moments: university, childhood, friendship, travel and the hard days.",
+        content:
+          "Real experiences and memorable moments: university, childhood, friendship, travel and the hard days.",
       },
       { property: "og:title", content: "Stories — The Founder" },
       { property: "og:description", content: "Share the moments that made you." },

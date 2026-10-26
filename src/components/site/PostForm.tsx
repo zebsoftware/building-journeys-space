@@ -1,4 +1,3 @@
-
 import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -59,10 +58,7 @@ export function PostForm({ existing }: { existing?: PostRow | null }) {
     };
   }, [previewUrl]);
 
-  const set = <K extends keyof PostDraft>(
-    key: K,
-    value: PostDraft[K]
-  ) => {
+  const set = <K extends keyof PostDraft>(key: K, value: PostDraft[K]) => {
     setDraft((current) => ({
       ...current,
       [key]: value,
@@ -77,12 +73,7 @@ export function PostForm({ existing }: { existing?: PostRow | null }) {
   const chooseImage = (file?: File) => {
     if (!file) return;
 
-    const allowedTypes = [
-      "image/jpeg",
-      "image/png",
-      "image/webp",
-      "image/gif",
-    ];
+    const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 
     if (!allowedTypes.includes(file.type)) {
       toast.error("Please select a JPG, PNG, WebP, or GIF image.");
@@ -126,10 +117,7 @@ export function PostForm({ existing }: { existing?: PostRow | null }) {
       if (selectedImage) {
         setUploading(true);
 
-        coverImage = await uploadCoverImage(
-          selectedImage,
-          user.id
-        );
+        coverImage = await uploadCoverImage(selectedImage, user.id);
 
         setUploading(false);
       }
@@ -144,30 +132,21 @@ export function PostForm({ existing }: { existing?: PostRow | null }) {
           .filter(Boolean),
         cover_image: coverImage || null,
         reflection_prompt: draft.reflectionPrompt.trim() || null,
-        day_number: draft.dayNumber
-          ? Number(draft.dayNumber)
-          : null,
+        day_number: draft.dayNumber ? Number(draft.dayNumber) : null,
         content: draft.content,
         read_minutes: readingMinutes(draft.content),
         status,
         published_at:
-          status === "published"
-            ? existing?.published_at ?? new Date().toISOString()
-            : null,
+          status === "published" ? (existing?.published_at ?? new Date().toISOString()) : null,
       };
 
       if (existing) {
-        const { error } = await supabase
-          .from("posts")
-          .update(payload)
-          .eq("id", existing.id);
+        const { error } = await supabase.from("posts").update(payload).eq("id", existing.id);
 
         if (error) throw error;
 
         toast.success(
-          status === "published"
-            ? "Post updated successfully"
-            : "Draft saved successfully"
+          status === "published" ? "Post updated successfully" : "Draft saved successfully",
         );
 
         void navigate({
@@ -175,24 +154,18 @@ export function PostForm({ existing }: { existing?: PostRow | null }) {
           params: { slug: existing.slug },
         });
       } else {
-        const slug = `${slugify(draft.title)}-${Math.random()
-          .toString(36)
-          .slice(2, 7)}`;
+        const slug = `${slugify(draft.title)}-${Math.random().toString(36).slice(2, 7)}`;
 
-        const { error } = await supabase
-          .from("posts")
-          .insert({
-            ...payload,
-            slug,
-            author_id: user.id,
-          });
+        const { error } = await supabase.from("posts").insert({
+          ...payload,
+          slug,
+          author_id: user.id,
+        });
 
         if (error) throw error;
 
         toast.success(
-          status === "published"
-            ? "Post published successfully"
-            : "Draft saved successfully"
+          status === "published" ? "Post published successfully" : "Draft saved successfully",
         );
 
         void navigate(
@@ -203,7 +176,7 @@ export function PostForm({ existing }: { existing?: PostRow | null }) {
               }
             : {
                 to: "/",
-              }
+              },
         );
       }
 
@@ -213,11 +186,7 @@ export function PostForm({ existing }: { existing?: PostRow | null }) {
     } catch (error) {
       console.error("Post save error:", error);
 
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : "Couldn't save your post."
-      );
+      toast.error(error instanceof Error ? error.message : "Couldn't save your post.");
     } finally {
       setUploading(false);
       setBusy(false);
@@ -228,15 +197,12 @@ export function PostForm({ existing }: { existing?: PostRow | null }) {
   const field =
     "mt-2 w-full rounded-xl border border-line bg-card px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-ring";
 
-  const labelClass =
-    "text-xs uppercase tracking-[0.15em] text-inksoft";
+  const labelClass = "text-xs uppercase tracking-[0.15em] text-inksoft";
 
   if (loading) {
     return (
       <SiteLayout>
-        <Container className="py-24 text-center text-sm text-inksoft">
-          Loading…
-        </Container>
+        <Container className="py-24 text-center text-sm text-inksoft">Loading…</Container>
       </SiteLayout>
     );
   }
@@ -245,9 +211,7 @@ export function PostForm({ existing }: { existing?: PostRow | null }) {
     return (
       <SiteLayout>
         <Container className="max-w-[520px] py-24 text-center">
-          <h1 className="font-display text-3xl">
-            Sign in to write
-          </h1>
+          <h1 className="font-display text-3xl">Sign in to write</h1>
 
           <p className="mt-3 text-sm text-inksoft">
             You need an account to publish on The Founder.
@@ -328,16 +292,11 @@ export function PostForm({ existing }: { existing?: PostRow | null }) {
 
             <select
               value={draft.category}
-              onChange={(e) =>
-                set("category", e.target.value as CategorySlug)
-              }
+              onChange={(e) => set("category", e.target.value as CategorySlug)}
               className={field}
             >
               {CATEGORIES.map((category) => (
-                <option
-                  key={category.slug}
-                  value={category.slug}
-                >
+                <option key={category.slug} value={category.slug}>
                   {category.label}
                 </option>
               ))}
@@ -345,9 +304,7 @@ export function PostForm({ existing }: { existing?: PostRow | null }) {
           </label>
 
           <label className="block">
-            <span className={labelClass}>
-              Tags (comma separated)
-            </span>
+            <span className={labelClass}>Tags (comma separated)</span>
 
             <input
               value={draft.tags}
@@ -358,10 +315,7 @@ export function PostForm({ existing }: { existing?: PostRow | null }) {
 
           {/* COVER IMAGE UPLOAD */}
           <div className="block">
-            <label
-              htmlFor="cover-image-upload"
-              className={labelClass}
-            >
+            <label htmlFor="cover-image-upload" className={labelClass}>
               Cover image from gallery
             </label>
 
@@ -370,9 +324,7 @@ export function PostForm({ existing }: { existing?: PostRow | null }) {
               type="file"
               accept="image/jpeg,image/png,image/webp,image/gif"
               disabled={savingDisabled}
-              onChange={(e) =>
-                chooseImage(e.target.files?.[0])
-              }
+              onChange={(e) => chooseImage(e.target.files?.[0])}
               className={field}
             />
 
@@ -382,9 +334,7 @@ export function PostForm({ existing }: { existing?: PostRow | null }) {
 
             {(previewUrl || draft.coverImage) && (
               <div className="mt-4">
-                <p className="mb-2 text-xs text-inksoft">
-                  Image preview
-                </p>
+                <p className="mb-2 text-xs text-inksoft">Image preview</p>
 
                 <img
                   src={previewUrl || draft.coverImage}
@@ -394,38 +344,26 @@ export function PostForm({ existing }: { existing?: PostRow | null }) {
               </div>
             )}
 
-            {uploading && (
-              <p className="mt-2 text-sm text-inksoft">
-                Uploading cover image…
-              </p>
-            )}
+            {uploading && <p className="mt-2 text-sm text-inksoft">Uploading cover image…</p>}
           </div>
 
           <label className="block">
-            <span className={labelClass}>
-              Day number (journeys)
-            </span>
+            <span className={labelClass}>Day number (journeys)</span>
 
             <input
               type="number"
               value={draft.dayNumber}
-              onChange={(e) =>
-                set("dayNumber", e.target.value)
-              }
+              onChange={(e) => set("dayNumber", e.target.value)}
               className={field}
             />
           </label>
 
           <label className="block sm:col-span-2">
-            <span className={labelClass}>
-              Reflection prompt
-            </span>
+            <span className={labelClass}>Reflection prompt</span>
 
             <input
               value={draft.reflectionPrompt}
-              onChange={(e) =>
-                set("reflectionPrompt", e.target.value)
-              }
+              onChange={(e) => set("reflectionPrompt", e.target.value)}
               className={field}
             />
           </label>
@@ -441,8 +379,7 @@ export function PostForm({ existing }: { existing?: PostRow | null }) {
 
           {editorUploading && (
             <p className="mt-3 text-sm text-inksoft">
-              Uploading image inside your blog.
-              Publishing is temporarily disabled.
+              Uploading image inside your blog. Publishing is temporarily disabled.
             </p>
           )}
         </div>

@@ -67,12 +67,19 @@ export async function fetchPosts(options: {
 }
 
 export async function fetchPostBySlug(slug: string): Promise<PostRow | null> {
-  const { data, error } = await supabase.from("posts").select(POST_SELECT).eq("slug", slug).maybeSingle();
+  const { data, error } = await supabase
+    .from("posts")
+    .select(POST_SELECT)
+    .eq("slug", slug)
+    .maybeSingle();
   if (error) throw error;
   return (data as unknown as PostRow) ?? null;
 }
 
-export async function fetchAuthorPosts(authorId: string, includeDrafts = false): Promise<PostRow[]> {
+export async function fetchAuthorPosts(
+  authorId: string,
+  includeDrafts = false,
+): Promise<PostRow[]> {
   let query = supabase.from("posts").select(POST_SELECT).eq("author_id", authorId);
   if (!includeDrafts) query = query.eq("status", "published");
   const { data, error } = await query.order("created_at", { ascending: false });

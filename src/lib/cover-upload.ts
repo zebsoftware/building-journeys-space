@@ -1,24 +1,10 @@
-
 import { supabase } from "@/integrations/supabase/client";
 
-export async function uploadCoverImage(
-  file: File,
-  userId: string
-): Promise<string> {
-  const allowed = [
-    "image/jpeg",
-    "image/png",
-    "image/webp",
-    "image/gif",
-  ];
+export async function uploadCoverImage(file: File, userId: string): Promise<string> {
+  const allowed = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 
-  if (
-    !allowed.includes(file.type) ||
-    file.size > 5 * 1024 * 1024
-  ) {
-    throw new Error(
-      "Choose a JPG, PNG, WebP, or GIF image under 5 MB."
-    );
+  if (!allowed.includes(file.type) || file.size > 5 * 1024 * 1024) {
+    throw new Error("Choose a JPG, PNG, WebP, or GIF image under 5 MB.");
   }
 
   const extensions: Record<string, string> = {
@@ -30,19 +16,15 @@ export async function uploadCoverImage(
 
   const path = `${userId}/${crypto.randomUUID()}.${extensions[file.type]}`;
 
-  const { error } = await supabase.storage
-    .from("post-covers")
-    .upload(path, file, {
-      cacheControl: "3600",
-      contentType: file.type,
-      upsert: false,
-    });
+  const { error } = await supabase.storage.from("post-covers").upload(path, file, {
+    cacheControl: "3600",
+    contentType: file.type,
+    upsert: false,
+  });
 
   if (error) throw error;
 
-  const { data } = supabase.storage
-    .from("post-covers")
-    .getPublicUrl(path);
+  const { data } = supabase.storage.from("post-covers").getPublicUrl(path);
 
   return data.publicUrl;
 }

@@ -59,6 +59,9 @@ export function readingMinutes(html: string): number {
 }
 
 export function excerptFrom(html: string, length = 160): string {
-  const text = html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+  const text = html
+    .replace(/<[^>]*>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
   return text.length > length ? `${text.slice(0, length)}…` : text;
 }

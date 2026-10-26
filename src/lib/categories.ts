@@ -43,7 +43,8 @@ export const CATEGORIES: CategoryMeta[] = [
     label: "Creativity",
     tagline: "Show what you create.",
     path: "/creativity",
-    blurb: "Art, photography, sketches, poetry, music, design and the creative projects behind them.",
+    blurb:
+      "Art, photography, sketches, poetry, music, design and the creative projects behind them.",
   },
   {
     slug: "learning",

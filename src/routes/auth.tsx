@@ -11,7 +11,10 @@ export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
       { title: "Sign in — The Founder" },
-      { name: "description", content: "Sign in or create an account to write, comment and save posts on The Founder." },
+      {
+        name: "description",
+        content: "Sign in or create an account to write, comment and save posts on The Founder.",
+      },
       { property: "og:title", content: "Sign in — The Founder" },
       { property: "og:description", content: "Join a community writing about the process." },
     ],
@@ -76,7 +79,11 @@ function AuthPage() {
     <SiteLayout>
       <Container className="flex max-w-[460px] flex-col py-20">
         <h1 className="font-display text-4xl tracking-tight">
-          {mode === "signup" ? "Create your account" : mode === "reset" ? "Reset your password" : "Welcome back"}
+          {mode === "signup"
+            ? "Create your account"
+            : mode === "reset"
+              ? "Reset your password"
+              : "Welcome back"}
         </h1>
         <p className="mt-3 text-sm leading-relaxed text-inksoft">
           {mode === "reset"
@@ -124,24 +131,39 @@ function AuthPage() {
             onClick={() => void submit()}
             className="w-full rounded-full bg-ink px-6 py-3 text-sm text-background transition-opacity hover:opacity-90 disabled:opacity-50"
           >
-            {mode === "signup" ? "Create account" : mode === "reset" ? "Send reset link" : "Sign in"}
+            {mode === "signup"
+              ? "Create account"
+              : mode === "reset"
+                ? "Send reset link"
+                : "Sign in"}
           </button>
-
         </div>
 
         <div className="mt-8 flex flex-col gap-2 text-sm text-inksoft">
           {mode !== "signup" ? (
-            <button type="button" className="text-left underline-link w-fit" onClick={() => setMode("signup")}>
+            <button
+              type="button"
+              className="text-left underline-link w-fit"
+              onClick={() => setMode("signup")}
+            >
               New here? Create an account
             </button>
           ) : null}
           {mode !== "signin" ? (
-            <button type="button" className="text-left underline-link w-fit" onClick={() => setMode("signin")}>
+            <button
+              type="button"
+              className="text-left underline-link w-fit"
+              onClick={() => setMode("signin")}
+            >
               Already have an account? Sign in
             </button>
           ) : null}
           {mode !== "reset" ? (
-            <button type="button" className="text-left underline-link w-fit" onClick={() => setMode("reset")}>
+            <button
+              type="button"
+              className="text-left underline-link w-fit"
+              onClick={() => setMode("reset")}
+            >
               Forgot your password?
             </button>
           ) : null}

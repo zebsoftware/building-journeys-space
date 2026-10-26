@@ -30,12 +30,15 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 border-b border-line bg-background/85 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-[1200px] items-center gap-6 px-6">
-        <Link to="/" className="flex shrink-0 items-center gap-2.5 font-display text-xl font-medium tracking-tight">
-        <img
-  src="/founder-logo.png"
-  alt="The Founder"
-  className="size-10 rounded-sm object-contain"
-/>
+        <Link
+          to="/"
+          className="flex shrink-0 items-center gap-2.5 font-display text-xl font-medium tracking-tight"
+        >
+          <img
+            src="/founder-logo.png"
+            alt="The Founder"
+            className="size-10 rounded-sm object-contain"
+          />
           <span>The Founder</span>
         </Link>
 
@@ -72,7 +75,11 @@ export function Header() {
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger className="ml-1 flex items-center gap-2 rounded-full border border-line py-1 pl-1 pr-3 text-sm outline-none ring-offset-2 transition-colors hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring">
-                <InitialAvatar name={profile?.display_name ?? "You"} url={profile?.avatar_url} size={32} />
+                <InitialAvatar
+                  name={profile?.display_name ?? "You"}
+                  url={profile?.avatar_url}
+                  size={32}
+                />
                 <span className="hidden sm:inline">Profile</span>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-52">
