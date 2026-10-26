@@ -118,6 +118,10 @@ function parseSafeHtml(html: string): ReactNode {
       return null;
     }
 
+    // Void HTML elements cannot receive children in React, even an empty array.
+    if (tag === "br") return <br key={key} />;
+    if (tag === "hr") return <hr key={key} />;
+
     const children = Array.from(element.childNodes).map(render);
 
     // Unknown elements cannot retain attributes.
