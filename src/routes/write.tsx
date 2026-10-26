@@ -11,7 +11,7 @@ export const Route = createFileRoute("/write")({
         content: "Write and publish your story, journey, idea or creative work on The Founder.",
       },
       { property: "og:title", content: "Write a post — The Founder" },
-      { property: "og:description", content: "Everyone is building something. Share yours." },
+      { property: "og:description", content: "Everyone is creating something. Share yours." },
       { name: "robots", content: "noindex" },
     ],
   }),
