@@ -77,6 +77,26 @@ function AdminPage() {
     enabled: isAdmin,
   });
 
+  const { data: comments = [] } = useQuery({
+    queryKey: ["admin-comments"], enabled: isAdmin,
+    queryFn: async () => {
+      const { data, error } = await supabase.from("comments")
+        .select("id,post_id,body,created_at,author_id")
+        .order("created_at", { ascending: false }).limit(100);
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  const removeComment = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("comments").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => { void qc.invalidateQueries({ queryKey: ["admin-comments"] }); toast.success("Comment removed"); },
+    onError: () => toast.error("Could not remove comment"),
+  });
+
   const setStatus = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: "draft" | "published" }) => {
       const { error } = await supabase.from("posts").update({ status }).eq("id", id);
@@ -214,6 +234,23 @@ function AdminPage() {
             </tbody>
           </table>
         </div>
+
+        <h2 className="mt-14 border-b border-line pb-4 font-display text-2xl">Recent comments</h2>
+        {comments.length === 0 ? <p className="py-6 text-sm text-inksoft">No comments to review.</p> : (
+          <ul className="divide-y divide-line">
+            {comments.map((comment) => (
+              <li key={comment.id} className="flex items-start gap-4 py-4 text-sm">
+                <p className="min-w-0 flex-1 break-words whitespace-pre-wrap">{comment.body}</p>
+                <span className="shrink-0 text-xs text-inksoft">{formatDate(comment.created_at)}</span>
+                <button type="button" disabled={removeComment.isPending}
+                  onClick={() => { if (window.confirm("Delete this comment permanently?")) removeComment.mutate(comment.id); }}
+                  className="shrink-0 rounded-full border border-line px-3 py-1.5 text-xs text-destructive hover:bg-muted">
+                  Delete
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
 
         <h2 className="mt-14 border-b border-line pb-4 font-display text-2xl">Reports</h2>
         {reports.length === 0 ? (
