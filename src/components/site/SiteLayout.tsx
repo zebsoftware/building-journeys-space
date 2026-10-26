@@ -13,7 +13,13 @@ export function SiteLayout({ children }: { children: ReactNode }) {
   );
 }
 
-export function Container({ children, className = "" }: { children: ReactNode; className?: string }) {
+export function Container({
+  children,
+  className = "",
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
   return <div className={`mx-auto w-full max-w-[1200px] px-6 ${className}`}>{children}</div>;
 }
 

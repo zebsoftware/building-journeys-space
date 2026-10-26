@@ -35,6 +35,31 @@ function AdminPage() {
   const { isAdmin, loading, user } = useAuth();
   const qc = useQueryClient();
 
+  const { data: siteStats } = useQuery({
+    queryKey: ["admin-stats"],
+    enabled: isAdmin,
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("admin_site_stats" as never);
+      if (error) throw error;
+      const stats = (
+        data as unknown as Array<{
+          total_posts: number;
+          published_posts: number;
+          total_views: number;
+          open_reports: number;
+        }>
+      )?.[0];
+      if (!stats)
+        throw new Error("Admin statistics unavailable. Apply the latest Supabase migrations.");
+      return {
+        posts: Number(stats.total_posts),
+        published: Number(stats.published_posts),
+        views: Number(stats.total_views),
+        openReports: Number(stats.open_reports),
+      };
+    },
+  });
+
   const { data: posts = [] } = useQuery({
     queryKey: ["admin-posts"],
     queryFn: async () => {
@@ -62,6 +87,32 @@ function AdminPage() {
     enabled: isAdmin,
   });
 
+  const { data: comments = [] } = useQuery({
+    queryKey: ["admin-comments"],
+    enabled: isAdmin,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("comments")
+        .select("id,post_id,body,created_at,author_id")
+        .order("created_at", { ascending: false })
+        .limit(100);
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  const removeComment = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("comments").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["admin-comments"] });
+      toast.success("Comment removed");
+    },
+    onError: () => toast.error("Could not remove comment"),
+  });
+
   const setStatus = useMutation({
     mutationFn: async ({ id, status }: { id: string; status: "draft" | "published" }) => {
       const { error } = await supabase.from("posts").update({ status }).eq("id", id);
@@ -69,6 +120,7 @@ function AdminPage() {
     },
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ["admin-posts"] });
+      void qc.invalidateQueries({ queryKey: ["admin-stats"] });
       toast.success("Post updated");
     },
     onError: () => toast.error("Couldn't update the post."),
@@ -90,7 +142,10 @@ function AdminPage() {
       const { error } = await supabase.from("reports").update({ resolved: true }).eq("id", id);
       if (error) throw error;
     },
-    onSuccess: () => void qc.invalidateQueries({ queryKey: ["admin-reports"] }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["admin-reports"] });
+      void qc.invalidateQueries({ queryKey: ["admin-stats"] });
+    },
   });
 
   if (loading) {
@@ -115,9 +170,6 @@ function AdminPage() {
     );
   }
 
-  const published = posts.filter((post) => post.status === "published").length;
-  const totalViews = posts.reduce((sum, post) => sum + (post.views ?? 0), 0);
-
   return (
     <SiteLayout>
       <Container className="py-14">
@@ -125,10 +177,10 @@ function AdminPage() {
 
         <div className="mt-8 grid gap-px overflow-hidden rounded-2xl border border-line bg-line sm:grid-cols-4">
           {[
-            { label: "Posts", value: posts.length },
-            { label: "Published", value: published },
-            { label: "Views", value: compactNumber(totalViews) },
-            { label: "Open reports", value: reports.filter((report) => !report.resolved).length },
+            { label: "Posts", value: siteStats?.posts ?? "…" },
+            { label: "Published", value: siteStats?.published ?? "…" },
+            { label: "Views", value: siteStats ? compactNumber(siteStats.views) : "…" },
+            { label: "Open reports", value: siteStats?.openReports ?? "…" },
           ].map((stat) => (
             <div key={stat.label} className="bg-background p-6">
               <p className="font-display text-3xl">{stat.value}</p>
@@ -162,7 +214,9 @@ function AdminPage() {
                   <td>
                     <span
                       className={`rounded-full px-2.5 py-1 text-xs ${
-                        post.status === "published" ? "bg-ember/10 text-emberdeep" : "bg-muted text-inksoft"
+                        post.status === "published"
+                          ? "bg-ember/10 text-emberdeep"
+                          : "bg-muted text-inksoft"
                       }`}
                     >
                       {post.status}
@@ -185,7 +239,10 @@ function AdminPage() {
                     </button>
                     <button
                       type="button"
-                      onClick={() => removePost.mutate(post.id)}
+                      onClick={() => {
+                        if (window.confirm("Permanently delete this post and its comments?"))
+                          removePost.mutate(post.id);
+                      }}
                       className="rounded-full border border-line px-3 py-1.5 text-xs text-destructive hover:bg-muted"
                     >
                       Delete
@@ -196,6 +253,33 @@ function AdminPage() {
             </tbody>
           </table>
         </div>
+
+        <h2 className="mt-14 border-b border-line pb-4 font-display text-2xl">Recent comments</h2>
+        {comments.length === 0 ? (
+          <p className="py-6 text-sm text-inksoft">No comments to review.</p>
+        ) : (
+          <ul className="divide-y divide-line">
+            {comments.map((comment) => (
+              <li key={comment.id} className="flex items-start gap-4 py-4 text-sm">
+                <p className="min-w-0 flex-1 break-words whitespace-pre-wrap">{comment.body}</p>
+                <span className="shrink-0 text-xs text-inksoft">
+                  {formatDate(comment.created_at)}
+                </span>
+                <button
+                  type="button"
+                  disabled={removeComment.isPending}
+                  onClick={() => {
+                    if (window.confirm("Delete this comment permanently?"))
+                      removeComment.mutate(comment.id);
+                  }}
+                  className="shrink-0 rounded-full border border-line px-3 py-1.5 text-xs text-destructive hover:bg-muted"
+                >
+                  Delete
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
 
         <h2 className="mt-14 border-b border-line pb-4 font-display text-2xl">Reports</h2>
         {reports.length === 0 ? (

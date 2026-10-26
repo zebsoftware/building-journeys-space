@@ -6,7 +6,10 @@ export const Route = createFileRoute("/creativity")({
   head: () => ({
     meta: [
       { title: "Creativity — The Founder" },
-      { name: "description", content: "Art, photography, sketches, poetry, music and design from the community." },
+      {
+        name: "description",
+        content: "Art, photography, sketches, poetry, music and design from the community.",
+      },
       { property: "og:title", content: "Creativity — The Founder" },
       { property: "og:description", content: "Show what you create." },
     ],

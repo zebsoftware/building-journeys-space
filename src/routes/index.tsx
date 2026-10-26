@@ -57,8 +57,8 @@ function Index() {
               Everyone is building something.
             </h1>
             <p className="mt-6 max-w-[46ch] text-lg leading-relaxed text-inksoft">
-              The Founder is a home for the honest middle of the work — the stories, journeys, ideas and
-              creative attempts that rarely make it to a highlight reel.
+              The Founder is a home for the honest middle of the work — the stories, journeys, ideas
+              and creative attempts that rarely make it to a highlight reel.
             </p>
             <div className="mt-9 flex flex-wrap items-center gap-3">
               <Link
@@ -201,7 +201,9 @@ function Index() {
       <section>
         <Container className="py-20">
           <div className="rounded-2xl bg-inverse px-8 py-16 text-center text-inverse-foreground">
-            <p className="text-[11px] uppercase tracking-[0.22em] opacity-70">A prompt to sit with</p>
+            <p className="text-[11px] uppercase tracking-[0.22em] opacity-70">
+              A prompt to sit with
+            </p>
             <p className="mx-auto mt-6 max-w-[24ch] font-display text-3xl leading-snug sm:text-4xl">
               What are you building that nobody sees yet?
             </p>
