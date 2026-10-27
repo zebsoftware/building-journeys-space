@@ -134,7 +134,6 @@ export const Route = createRootRouteWithContext<{
       },
     ],
     links: [
-      { rel: "canonical", href: "https://thefounderblogs.vercel.app/" },
       {
         rel: "stylesheet",
         href: appCss,
