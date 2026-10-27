@@ -113,6 +113,10 @@ export const Route = createRootRouteWithContext<{
       },
       { property: "og:url", content: "https://thefounderblogs.vercel.app/" },
       {
+        name: "google-site-verification",
+        content: "yVUsIO3AYcXL4aWnXE_pNicwDBDkHG8-SauYeDK4TKI",
+      },
+      {
         name: "author",
         content: "The Founder",
       },
