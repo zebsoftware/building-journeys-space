@@ -111,6 +111,7 @@ export const Route = createRootRouteWithContext<{
         content:
           "A community of writers sharing stories, journeys, ideas, creativity and lessons from the middle of the work.",
       },
+      { property: "og:url", content: "https://thefounderblogs.vercel.app/" },
       {
         name: "author",
         content: "The Founder",

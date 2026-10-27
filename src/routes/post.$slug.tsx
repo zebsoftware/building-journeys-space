@@ -27,9 +27,20 @@ export const Route = createFileRoute("/post/$slug")({
   head: ({ params }) => ({
     meta: [
       { title: `${params.slug.replace(/-/g, " ")} — The Founder` },
-      { name: "description", content: "A story from The Founder community." },
-      { property: "og:title", content: "The Founder" },
-      { property: "og:description", content: "A story from The Founder community." },
+      {
+        name: "description",
+        content: `Read ${params.slug.replace(/-/g, " ")} on The Founder. Discover personal stories, lessons, and creative journeys.`,
+      },
+      { property: "og:title", content: `${params.slug.replace(/-/g, " ")} — The Founder` },
+      { property: "og:description", content: "Read this original story on The Founder." },
+      { property: "og:type", content: "article" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+    links: [
+      {
+        rel: "canonical",
+        href: `https://thefounderblogs.vercel.app/post/${encodeURIComponent(params.slug)}`,
+      },
     ],
   }),
   component: PostPage,
@@ -140,24 +151,7 @@ function PostPage() {
           ) : null}
 
           <div className="mt-8 flex flex-wrap items-center gap-4 border-y border-line py-5">
-            <Link
-              to="/u/$username"
-              params={{ username: post.author?.username ?? "" }}
-              className="flex items-center gap-3"
-            >
-              <InitialAvatar
-                name={post.author?.display_name ?? "Anonymous"}
-                url={post.author?.avatar_url}
-                size={40}
-              />
-              <span>
-                <span className="block text-sm">{post.author?.display_name ?? "Anonymous"}</span>
-                <span className="block text-xs text-inksoft">
-                  {formatDate(post.published_at ?? post.created_at)} · {post.read_minutes} min read
-                </span>
-              </span>
-            </Link>
-            <div className="ml-auto flex items-center gap-2">
+            <div className="flex w-full flex-wrap items-center justify-end gap-2">
               {canEdit ? (
                 <Link
                   to="/edit/$id"
@@ -241,6 +235,29 @@ function PostPage() {
               <p className="mt-4 font-display text-2xl leading-snug">{post.reflection_prompt}</p>
             </div>
           ) : null}
+          <section aria-label="About the author" className="mt-12 border-t border-line pt-8">
+            <p className="mb-4 text-xs uppercase tracking-[0.18em] text-ember">Written by</p>
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <Link
+                to="/u/$username"
+                params={{ username: post.author?.username ?? "" }}
+                className="flex items-center gap-3"
+              >
+                <InitialAvatar
+                  name={post.author?.display_name ?? "Anonymous"}
+                  url={post.author?.avatar_url}
+                  size={40}
+                />
+                <span>
+                  <span className="block text-sm">{post.author?.display_name ?? "Anonymous"}</span>
+                  <span className="block text-xs text-inksoft">
+                    {formatDate(post.published_at ?? post.created_at)} · {post.read_minutes} min
+                    read
+                  </span>
+                </span>
+              </Link>
+            </div>
+          </section>
         </Container>
 
         {/* Comments */}
