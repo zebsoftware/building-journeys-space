@@ -27,13 +27,21 @@ export const Route = createFileRoute("/post/$slug")({
   head: ({ params }) => ({
     meta: [
       { title: `${params.slug.replace(/-/g, " ")} — The Founder` },
-      { name: "description", content: `Read ${params.slug.replace(/-/g, " ")} on The Founder. Discover personal stories, lessons, and creative journeys.` },
+      {
+        name: "description",
+        content: `Read ${params.slug.replace(/-/g, " ")} on The Founder. Discover personal stories, lessons, and creative journeys.`,
+      },
       { property: "og:title", content: `${params.slug.replace(/-/g, " ")} — The Founder` },
       { property: "og:description", content: "Read this original story on The Founder." },
       { property: "og:type", content: "article" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
-    links: [{ rel: "canonical", href: `https://thefounderblogs.vercel.app/post/${encodeURIComponent(params.slug)}` }],
+    links: [
+      {
+        rel: "canonical",
+        href: `https://thefounderblogs.vercel.app/post/${encodeURIComponent(params.slug)}`,
+      },
+    ],
   }),
   component: PostPage,
 });
@@ -243,13 +251,13 @@ function PostPage() {
                 <span>
                   <span className="block text-sm">{post.author?.display_name ?? "Anonymous"}</span>
                   <span className="block text-xs text-inksoft">
-                    {formatDate(post.published_at ?? post.created_at)} · {post.read_minutes} min read
+                    {formatDate(post.published_at ?? post.created_at)} · {post.read_minutes} min
+                    read
                   </span>
                 </span>
               </Link>
             </div>
           </section>
-
         </Container>
 
         {/* Comments */}
