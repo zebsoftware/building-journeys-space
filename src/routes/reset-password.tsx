@@ -4,6 +4,7 @@ import { toast } from "sonner";
 
 import { Container, SiteLayout } from "@/components/site/SiteLayout";
 import { supabase } from "@/integrations/supabase/client";
+import { PASSWORD_RULES, isStrongPassword } from "@/lib/password";
 
 export const Route = createFileRoute("/reset-password")({
   head: () => ({
@@ -24,6 +25,10 @@ function ResetPasswordPage() {
   const navigate = useNavigate();
 
   const submit = async () => {
+    if (!isStrongPassword(password)) {
+      toast.error("Use 12+ characters with uppercase, lowercase, a number, and a symbol.");
+      return;
+    }
     setBusy(true);
     try {
       const { error } = await supabase.auth.updateUser({ password });
@@ -45,14 +50,24 @@ function ResetPasswordPage() {
           <span className="text-xs uppercase tracking-[0.15em] text-inksoft">New password</span>
           <input
             type="password"
+            autoComplete="new-password"
+            minLength={12}
             value={password}
             onChange={(event) => setPassword(event.target.value)}
             className="mt-2 w-full rounded-xl border border-line bg-card px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-ring"
           />
         </label>
+        <div className="mt-4 rounded-xl border border-line bg-card px-4 py-3">
+          <p className="mb-2 text-xs font-medium text-ink">Password requirements</p>
+          {PASSWORD_RULES.map(({ label, test }) => (
+            <p key={label} className="text-xs text-inksoft">
+              <span aria-hidden="true">{test(password) ? "✓" : "○"}</span> {label}
+            </p>
+          ))}
+        </div>
         <button
           type="button"
-          disabled={busy || password.length < 6}
+          disabled={busy || !isStrongPassword(password)}
           onClick={() => void submit()}
           className="mt-6 w-full rounded-full bg-ink px-6 py-3 text-sm text-background disabled:opacity-50"
         >
