@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { Container, SiteLayout } from "@/components/site/SiteLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { slugify } from "@/lib/format";
+import { PASSWORD_RULES, isStrongPassword } from "@/lib/password";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -47,6 +47,10 @@ function AuthPage() {
         if (error) throw error;
         toast.success("Check your inbox for a reset link.");
       } else if (mode === "signup") {
+        if (!isStrongPassword(password)) {
+          toast.error("Use 12+ characters with uppercase, lowercase, a number, and a symbol.");
+          return;
+        }
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
@@ -117,6 +121,8 @@ function AuthPage() {
               <span className="text-xs uppercase tracking-[0.15em] text-inksoft">Password</span>
               <input
                 type="password"
+                autoComplete={mode === "signup" ? "new-password" : "current-password"}
+                minLength={mode === "signup" ? 12 : undefined}
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
                 className="mt-2 w-full rounded-xl border border-line bg-card px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-ring"
@@ -124,9 +130,20 @@ function AuthPage() {
             </label>
           ) : null}
 
+          {mode === "signup" ? (
+            <div className="rounded-xl border border-line bg-card px-4 py-3">
+              <p className="mb-2 text-xs font-medium text-ink">Password requirements</p>
+              {PASSWORD_RULES.map(({ label, test }) => (
+                <p key={label} className="text-xs text-inksoft">
+                  <span aria-hidden="true">{test(password) ? "✓" : "○"}</span> {label}
+                </p>
+              ))}
+            </div>
+          ) : null}
+
           <button
             type="button"
-            disabled={busy}
+            disabled={busy || (mode === "signup" && !isStrongPassword(password))}
             onClick={() => void submit()}
             className="w-full rounded-full bg-ink px-6 py-3 text-sm text-background transition-opacity hover:opacity-90 disabled:opacity-50"
           >
