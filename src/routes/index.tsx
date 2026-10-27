@@ -45,8 +45,6 @@ function Index() {
     queryFn: () => fetchPosts({ category: "creativity", limit: 6 }),
   });
 
-  const [hero, ...rest] = latest;
-
   return (
     <SiteLayout>
       {/* Hero */}
@@ -116,14 +114,11 @@ function Index() {
               </Link>
             }
           />
-          {hero ? (
-            <div className="grid gap-12 lg:grid-cols-[1.15fr_1fr]">
-              <PostCard post={hero} featured />
-              <div>
-                {rest.slice(0, 4).map((post) => (
-                  <PostRowItem key={post.id} post={post} />
-                ))}
-              </div>
+          {latest.length ? (
+            <div className="grid items-stretch gap-8 md:grid-cols-2">
+              {latest.slice(0, 4).map((post) => (
+                <PostCard key={post.id} post={post} featured />
+              ))}
             </div>
           ) : (
             <p className="text-sm text-inksoft">No posts published yet.</p>
