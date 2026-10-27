@@ -36,7 +36,7 @@ export function PostCard({ post, featured = false }: { post: PostRow; featured?:
   const cover = coverFor(post);
 
   return (
-    <article className="group">
+    <article className={`group ${featured ? "flex h-full flex-col" : ""}`}>
       <Link to="/post/$slug" params={{ slug: post.slug }} className="block">
         {cover ? (
           <div className="overflow-hidden rounded-xl bg-muted">
@@ -47,13 +47,15 @@ export function PostCard({ post, featured = false }: { post: PostRow; featured?:
               className={`zoom-media w-full object-cover ${featured ? "aspect-[16/10]" : "aspect-[4/3]"}`}
             />
           </div>
+        ) : featured ? (
+          <div className="aspect-[16/10] w-full rounded-xl bg-muted" aria-hidden="true" />
         ) : null}
-        <div className={cover ? "pt-5" : ""}>
+        <div className={cover || featured ? "pt-5" : ""}>
           <p className="text-[11px] uppercase tracking-[0.18em] text-ember">
             {categoryLabel(post.category)}
           </p>
           <h3
-            className={`mt-2 font-display font-medium leading-snug ${featured ? "text-3xl" : "text-xl"}`}
+            className={`mt-2 font-display font-medium leading-snug ${featured ? "line-clamp-2 text-2xl sm:text-3xl" : "text-xl"}`}
           >
             {post.title}
           </h3>
@@ -62,7 +64,7 @@ export function PostCard({ post, featured = false }: { post: PostRow; featured?:
           </p>
         </div>
       </Link>
-      <div className="mt-4">
+      <div className={featured ? "mt-auto pt-4" : "mt-4"}>
         <Meta post={post} />
       </div>
     </article>
