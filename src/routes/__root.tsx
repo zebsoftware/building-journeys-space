@@ -1,3 +1,4 @@
+
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,
@@ -15,13 +16,33 @@ import { ThemeProvider, themeBootstrapScript } from "@/lib/theme";
 import { AuthProvider } from "@/hooks/useAuth";
 import { Toaster } from "@/components/ui/sonner";
 
+const SITE_URL = "https://thefounderblogs.com";
+const SITE_NAME = "The Founder";
+const SITE_TITLE = "The Founder — Everyone is creating something";
+
+const SITE_DESCRIPTION =
+  "A community of writers sharing stories, journeys, ideas, creativity and lessons from the middle of the work.";
+
+const websiteStructuredData = JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: SITE_NAME,
+  alternateName: "The Founder Blogs",
+  url: `${SITE_URL}/`,
+  description: SITE_DESCRIPTION,
+});
+
 function NotFoundComponent() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
-        <h1 className="text-7xl font-bold text-foreground">404</h1>
+        <h1 className="text-7xl font-bold text-foreground">
+          404
+        </h1>
 
-        <h2 className="mt-4 text-xl font-semibold text-foreground">Page not found</h2>
+        <h2 className="mt-4 text-xl font-semibold text-foreground">
+          Page not found
+        </h2>
 
         <p className="mt-2 text-sm text-muted-foreground">
           The page you're looking for doesn't exist or has been moved.
@@ -40,7 +61,13 @@ function NotFoundComponent() {
   );
 }
 
-function ErrorComponent({ error, reset }: { error: unknown; reset: () => void }) {
+function ErrorComponent({
+  error,
+  reset,
+}: {
+  error: unknown;
+  reset: () => void;
+}) {
   const router = useRouter();
 
   useEffect(() => {
@@ -48,7 +75,9 @@ function ErrorComponent({ error, reset }: { error: unknown; reset: () => void })
       error instanceof Error
         ? error
         : new Error(
-            typeof error === "string" ? error : "An unexpected application error occurred.",
+            typeof error === "string"
+              ? error
+              : "An unexpected application error occurred.",
           );
 
     console.error("Application error:", normalizedError);
@@ -98,45 +127,67 @@ export const Route = createRootRouteWithContext<{
 }>()({
   head: () => ({
     meta: [
-      { charSet: "utf-8" },
+      {
+        charSet: "utf-8",
+      },
       {
         name: "viewport",
         content: "width=device-width, initial-scale=1",
       },
       {
-        title: "The Founder — Everyone is creating something",
+        title: SITE_TITLE,
       },
       {
         name: "description",
-        content:
-          "A community of writers sharing stories, journeys, ideas, creativity and lessons from the middle of the work.",
+        content: SITE_DESCRIPTION,
       },
-      { property: "og:url", content: "https://thefounderblogs.vercel.app/" },
+      {
+        name: "author",
+        content: SITE_NAME,
+      },
+      {
+        name: "application-name",
+        content: SITE_NAME,
+      },
       {
         name: "google-site-verification",
         content: "yVUsIO3AYcXL4aWnXE_pNicwDBDkHG8-SauYeDK4TKI",
       },
       {
-        name: "author",
-        content: "The Founder",
+        property: "og:site_name",
+        content: SITE_NAME,
       },
       {
         property: "og:title",
-        content: "The Founder — Everyone is creating something",
+        content: SITE_TITLE,
       },
       {
         property: "og:description",
-        content: "Stories, journeys, ideas, creativity and growth from people creating in public.",
+        content:
+          "Stories, journeys, ideas, creativity and growth from people creating in public.",
       },
       {
         property: "og:type",
         content: "website",
       },
       {
+        property: "og:url",
+        content: `${SITE_URL}/`,
+      },
+      {
         name: "twitter:card",
         content: "summary_large_image",
       },
+      {
+        name: "twitter:title",
+        content: SITE_TITLE,
+      },
+      {
+        name: "twitter:description",
+        content: SITE_DESCRIPTION,
+      },
     ],
+
     links: [
       {
         rel: "stylesheet",
@@ -173,7 +224,19 @@ function RootShell({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <head>
-        <script dangerouslySetInnerHTML={{ __html: themeBootstrapScript }} />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: themeBootstrapScript,
+          }}
+        />
+
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: websiteStructuredData,
+          }}
+        />
+
         <HeadContent />
       </head>
 
