@@ -7,13 +7,17 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useEffect, type ReactNode } from "react";
+import { lazy, Suspense, useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { ThemeProvider, themeBootstrapScript } from "@/lib/theme";
 import { AuthProvider } from "@/hooks/useAuth";
 import { Toaster } from "@/components/ui/sonner";
+
+declare const __VERCEL_IMAGE_OPTIMIZATION__: boolean;
+
+const PerformanceVitals = lazy(() => import("@/components/site/PerformanceVitals"));
 
 const SITE_URL = "https://thefounderblogs.com";
 const SITE_NAME = "The Founder";
@@ -181,7 +185,7 @@ export const Route = createRootRouteWithContext<{
       },
       {
         rel: "icon",
-        href: "/favicon.png",
+        href: "/founder-logo.png",
         type: "image/png",
       },
     ],
@@ -194,16 +198,19 @@ export const Route = createRootRouteWithContext<{
 });
 
 function RootShell({ children }: { children: ReactNode }) {
+  const nonce = useRouter().options.ssr?.nonce;
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <script
+          nonce={nonce}
           dangerouslySetInnerHTML={{
             __html: themeBootstrapScript,
           }}
         />
 
         <script
+          nonce={nonce}
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: websiteStructuredData,
@@ -230,6 +237,11 @@ function RootComponent() {
         <AuthProvider>
           <Outlet />
           <Toaster position="top-center" />
+          {__VERCEL_IMAGE_OPTIMIZATION__ && (
+            <Suspense fallback={null}>
+              <PerformanceVitals />
+            </Suspense>
+          )}
         </AuthProvider>
       </ThemeProvider>
     </QueryClientProvider>

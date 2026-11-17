@@ -3,7 +3,9 @@ import { useQuery } from "@tanstack/react-query";
 import { ArrowRight } from "lucide-react";
 
 import heroRoadSmall from "@/assets/hero-road-480.webp";
+import heroRoadMedium from "@/assets/hero-road-720.webp";
 import heroRoad from "@/assets/hero-road-960.webp";
+import heroFont from "@/assets/fonts/fraunces-latin.woff2?url";
 import { Container, SectionHeading, SiteLayout } from "@/components/site/SiteLayout";
 import { CreativityCard, JourneyCard, PostCard, PostRowItem } from "@/components/site/PostCard";
 import { CATEGORIES } from "@/lib/categories";
@@ -11,6 +13,9 @@ import { fetchPosts } from "@/lib/posts";
 
 export const Route = createFileRoute("/")({
   head: () => ({
+    links: [
+      { rel: "preload", href: heroFont, as: "font", type: "font/woff2", crossOrigin: "anonymous" },
+    ],
     meta: [
       { title: "The Founder — Everyone is creating something" },
       {
@@ -81,8 +86,8 @@ function Index() {
           <div className="overflow-hidden rounded-2xl bg-muted">
             <img
               src={heroRoad}
-              srcSet={`${heroRoadSmall} 480w, ${heroRoad} 960w`}
-              sizes="(min-width: 1200px) 520px, (min-width: 1024px) 46vw, 94vw"
+              srcSet={`${heroRoadSmall} 480w, ${heroRoadMedium} 720w, ${heroRoad} 960w`}
+              sizes="(min-width: 1200px) 520px, (min-width: 1024px) 46vw, calc(100vw - 48px)"
               width={960}
               height={1200}
               fetchPriority="high"
@@ -94,8 +99,11 @@ function Index() {
       </section>
 
       {/* Categories */}
-      <section className="border-b border-line">
+      <section aria-labelledby="category-heading" className="border-b border-line">
         <Container className="py-14">
+          <h2 id="category-heading" className="sr-only">
+            Browse by category
+          </h2>
           <div className="grid gap-px overflow-hidden rounded-2xl border border-line bg-line sm:grid-cols-2 lg:grid-cols-5">
             {CATEGORIES.map((category) => (
               <Link

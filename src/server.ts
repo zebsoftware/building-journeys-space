@@ -1,10 +1,11 @@
 import "./lib/error-capture";
 
+import { cspNonce } from "./lib/csp-nonce.server";
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
 
 type ServerEntry = {
-  fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
+  fetch: (request: Request) => Promise<Response> | Response;
 };
 
 let serverEntryPromise: Promise<ServerEntry> | undefined;
@@ -44,17 +45,76 @@ function isH3SwallowedErrorBody(body: string): boolean {
   }
 }
 
+const productionHosts = new Set([
+  "thefounderblogs.com",
+  "www.thefounderblogs.com",
+  "thefounderblogs.vercel.app",
+]);
+
+function csp(nonce: string) {
+  const endpoints = new Set<string>([
+    "https://ygqonurswpnwwqxfbjpq.supabase.co",
+    "wss://ygqonurswpnwwqxfbjpq.supabase.co",
+  ]);
+  const configured = process.env["SUPABASE_URL"] || import.meta.env["VITE_SUPABASE_URL"];
+  if (configured) {
+    try {
+      const url = new URL(configured);
+      endpoints.add(url.origin);
+      if (url.protocol === "https:") endpoints.add(`wss://${url.host}`);
+    } catch {
+      // Invalid environment settings must not weaken the CSP.
+    }
+  }
+  return [
+    "default-src 'self'",
+    "base-uri 'self'",
+    "object-src 'none'",
+    "frame-ancestors 'none'",
+    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'`,
+    "script-src-attr 'none'",
+    "style-src 'self' 'unsafe-inline'",
+    "font-src 'self'",
+    "img-src 'self' https: data: blob:",
+    `connect-src 'self' ${[...endpoints].join(" ")}`,
+    "form-action 'self'",
+  ].join("; ");
+}
+
 export default {
-  async fetch(request: Request, env: unknown, ctx: unknown) {
+  async fetch(request: Request) {
     try {
       const handler = await getServerEntry();
-      const response = await handler.fetch(request, env, ctx);
-      return await normalizeCatastrophicSsrResponse(response);
+      const hostname = new URL(request.url).hostname;
+      const production = productionHosts.has(hostname);
+      const protect = !import.meta.env.DEV && (production || process.env["VERCEL"] === "1");
+      const nonce = protect ? crypto.randomUUID() : undefined;
+      const response = await normalizeCatastrophicSsrResponse(
+        nonce
+          ? await cspNonce.run(nonce, () => handler.fetch(request))
+          : await handler.fetch(request),
+      );
+      if (!nonce || !response.headers.get("content-type")?.includes("text/html")) return response;
+
+      const secured = new Headers(response.headers);
+      secured.set("Content-Security-Policy", csp(nonce));
+      secured.set("Cache-Control", "private, no-store");
+      if (production) secured.set("Cross-Origin-Opener-Policy", "same-origin");
+      return new Response(response.body, {
+        status: response.status,
+        statusText: response.statusText,
+        headers: secured,
+      });
     } catch (error) {
       console.error(error);
       return new Response(renderErrorPage(), {
         status: 500,
-        headers: { "content-type": "text/html; charset=utf-8" },
+        headers: {
+          "content-type": "text/html; charset=utf-8",
+          "cache-control": "no-store",
+          "content-security-policy":
+            "default-src 'none'; style-src 'unsafe-inline'; frame-ancestors 'none'",
+        },
       });
     }
   },
