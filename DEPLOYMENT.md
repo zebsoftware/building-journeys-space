@@ -53,3 +53,17 @@ Do not give the browser privileged keys and never make role assignment accessibl
   signup, password reset, publishing and the editor before tightening them.
 - Public view counts are an approximate engagement metric. The guest view-count
   endpoint is still public and does not provide abuse-resistant analytics.
+
+## Image performance
+
+- Still images are resized before upload. Covers use up to 1600 px on the longest
+  side, inline images 1200 px and avatars 384 px. Smaller originals and supported
+  animated images are preserved where appropriate.
+- New uploads retain their random object keys and use long browser caching.
+  Replace an image through the editor rather than rewriting an existing object.
+- Vercel's image optimizer is enabled for this project's public Supabase cover
+  URLs. GIFs and other origins are served directly. If optimization fails, the
+  browser retries the original. Review image transformation usage in Vercel.
+- On the preview, open a post with an existing cover and confirm the image
+  request returns successfully. Upload a large JPEG in a test post and check
+  the stored file dimensions, size, and content type in Supabase Storage.

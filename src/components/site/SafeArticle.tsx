@@ -1,3 +1,4 @@
+import { PostImage } from "@/components/site/PostImage";
 import { useEffect, useState, type ReactNode } from "react";
 
 /**
@@ -145,8 +146,10 @@ function parseSafeHtml(html: string): ReactNode {
       const src = safeUrl(element.getAttribute("src") ?? "", true);
 
       return src ? (
-        <img
+        <PostImage
           key={key}
+          variant="article"
+          sizes="(min-width: 800px) 760px, 94vw"
           src={src}
           alt={(element.getAttribute("alt") ?? "").slice(0, 200)}
           loading="lazy"

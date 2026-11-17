@@ -5,7 +5,6 @@ import { Container, SiteLayout } from "@/components/site/SiteLayout";
 import { PostRowItem } from "@/components/site/PostCard";
 import { useAuth } from "@/hooks/useAuth";
 import { fetchBookmarkedPosts } from "@/lib/engagement";
-import type { PostRow } from "@/lib/posts";
 
 export const Route = createFileRoute("/bookmarks")({
   head: () => ({
@@ -24,7 +23,7 @@ function BookmarksPage() {
   const { user, loading } = useAuth();
   const { data: posts = [] } = useQuery({
     queryKey: ["bookmarks", user?.id],
-    queryFn: async () => (await fetchBookmarkedPosts(user!.id)) as PostRow[],
+    queryFn: () => fetchBookmarkedPosts(user!.id),
     enabled: Boolean(user?.id),
   });
 

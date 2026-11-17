@@ -6,7 +6,8 @@ import Placeholder from "@tiptap/extension-placeholder";
 import { toast } from "sonner";
 
 import { useAuth } from "@/hooks/useAuth";
-import { uploadCoverImage } from "@/lib/cover-upload";
+import { uploadImage } from "@/lib/cover-upload";
+import { validateImage } from "@/lib/image-compression";
 
 import {
   Bold,
@@ -62,15 +63,10 @@ export function Editor({
       return;
     }
 
-    const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"];
-
-    if (!allowedTypes.includes(file.type)) {
-      toast.error("Select a JPG, PNG, WebP or GIF image.");
-      return;
-    }
-
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error("Image must be smaller than 5 MB.");
+    try {
+      validateImage(file, "inline");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Choose a supported image.");
       return;
     }
 
@@ -83,7 +79,7 @@ export function Editor({
 
     try {
       // Upload file to Supabase Storage.
-      const imageUrl = await uploadCoverImage(file, user.id);
+      const imageUrl = await uploadImage(file, user.id, "inline");
 
       // Insert uploaded image inside the blog body.
       const insertPosition = Math.min(position, editor.state.doc.content.size);

@@ -1,13 +1,14 @@
 import { Link } from "@tanstack/react-router";
 import { Heart, MessageCircle } from "lucide-react";
 
+import { PostImage } from "@/components/site/PostImage";
 import { InitialAvatar } from "@/components/site/InitialAvatar";
 import { categoryLabel } from "@/lib/categories";
-import { compactNumber, excerptFrom, timeAgo } from "@/lib/format";
+import { compactNumber, timeAgo } from "@/lib/format";
 import { coverFor } from "@/lib/post-images";
-import type { PostRow } from "@/lib/posts";
+import type { PostSummary } from "@/lib/posts";
 
-function Meta({ post }: { post: PostRow }) {
+function Meta({ post }: { post: PostSummary }) {
   return (
     <div className="flex items-center gap-3 text-xs text-inksoft">
       <InitialAvatar
@@ -32,7 +33,7 @@ function Meta({ post }: { post: PostRow }) {
   );
 }
 
-export function PostCard({ post, featured = false }: { post: PostRow; featured?: boolean }) {
+export function PostCard({ post, featured = false }: { post: PostSummary; featured?: boolean }) {
   const cover = coverFor(post);
 
   return (
@@ -40,9 +41,10 @@ export function PostCard({ post, featured = false }: { post: PostRow; featured?:
       <Link to="/post/$slug" params={{ slug: post.slug }} className="block">
         {cover ? (
           <div className="overflow-hidden rounded-xl bg-muted">
-            <img
+            <PostImage
               src={cover}
               alt={post.title}
+              sizes="(min-width: 1024px) 560px, (min-width: 768px) 48vw, 94vw"
               loading="lazy"
               className={`zoom-media w-full object-cover ${featured ? "aspect-[16/10]" : "aspect-[4/3]"}`}
             />
@@ -59,9 +61,11 @@ export function PostCard({ post, featured = false }: { post: PostRow; featured?:
           >
             {post.title}
           </h3>
-          <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-inksoft">
-            {post.subtitle || excerptFrom(post.content)}
-          </p>
+          {post.subtitle && (
+            <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-inksoft">
+              {post.subtitle}
+            </p>
+          )}
         </div>
       </Link>
       <div className={featured ? "mt-auto pt-4" : "mt-4"}>
@@ -71,7 +75,7 @@ export function PostCard({ post, featured = false }: { post: PostRow; featured?:
   );
 }
 
-export function JourneyCard({ post }: { post: PostRow }) {
+export function JourneyCard({ post }: { post: PostSummary }) {
   return (
     <article className="group rounded-xl border border-line bg-card p-6 transition-shadow hover:shadow-soft">
       <Link to="/post/$slug" params={{ slug: post.slug }}>
@@ -84,9 +88,9 @@ export function JourneyCard({ post }: { post: PostRow }) {
           </span>
         </div>
         <h3 className="mt-4 font-display text-xl font-medium leading-snug">{post.title}</h3>
-        <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-inksoft">
-          {post.subtitle || excerptFrom(post.content)}
-        </p>
+        {post.subtitle && (
+          <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-inksoft">{post.subtitle}</p>
+        )}
       </Link>
       <div className="mt-5 border-t border-line pt-4">
         <Meta post={post} />
@@ -95,18 +99,19 @@ export function JourneyCard({ post }: { post: PostRow }) {
   );
 }
 
-export function CreativityCard({ post }: { post: PostRow }) {
+export function CreativityCard({ post }: { post: PostSummary }) {
   const cover = coverFor(post);
   return (
     <article className="group mb-6 break-inside-avoid">
       <Link to="/post/$slug" params={{ slug: post.slug }}>
         {cover ? (
           <div className="overflow-hidden rounded-xl bg-muted">
-            <img
+            <PostImage
               src={cover}
               alt={post.title}
+              sizes="(min-width: 1024px) 560px, (min-width: 768px) 48vw, 94vw"
               loading="lazy"
-              className="zoom-media w-full object-cover"
+              className="zoom-media aspect-[4/3] w-full object-cover"
             />
           </div>
         ) : null}
@@ -117,7 +122,7 @@ export function CreativityCard({ post }: { post: PostRow }) {
   );
 }
 
-export function PostRowItem({ post }: { post: PostRow }) {
+export function PostRowItem({ post }: { post: PostSummary }) {
   return (
     <article className="group border-b border-line py-6 last:border-b-0">
       <Link to="/post/$slug" params={{ slug: post.slug }} className="flex gap-6">
@@ -126,16 +131,20 @@ export function PostRowItem({ post }: { post: PostRow }) {
             {categoryLabel(post.category)}
           </p>
           <h3 className="mt-2 font-display text-xl font-medium leading-snug">{post.title}</h3>
-          <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-inksoft">
-            {post.subtitle || excerptFrom(post.content)}
-          </p>
+          {post.subtitle && (
+            <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-inksoft">
+              {post.subtitle}
+            </p>
+          )}
           <div className="mt-4">
             <Meta post={post} />
           </div>
         </div>
         {coverFor(post) ? (
           <div className="hidden size-32 shrink-0 overflow-hidden rounded-xl bg-muted sm:block">
-            <img
+            <PostImage
+              variant="thumbnail"
+              sizes="128px"
               src={coverFor(post)!}
               alt={post.title}
               loading="lazy"

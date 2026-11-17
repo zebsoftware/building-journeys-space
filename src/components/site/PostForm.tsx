@@ -1,3 +1,4 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -8,7 +9,8 @@ import { CATEGORIES, type CategorySlug } from "@/lib/categories";
 import { readingMinutes, slugify } from "@/lib/format";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { uploadCoverImage } from "@/lib/cover-upload";
+import { uploadImage } from "@/lib/cover-upload";
+import { validateImage } from "@/lib/image-compression";
 import type { PostRow } from "@/lib/posts";
 
 export type PostDraft = {
@@ -38,6 +40,7 @@ function toDraft(post?: PostRow | null): PostDraft {
 export function PostForm({ existing }: { existing?: PostRow | null }) {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const [draft, setDraft] = useState<PostDraft>(() => toDraft(existing));
   const [busy, setBusy] = useState(false);
@@ -73,15 +76,10 @@ export function PostForm({ existing }: { existing?: PostRow | null }) {
   const chooseImage = (file?: File) => {
     if (!file) return;
 
-    const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"];
-
-    if (!allowedTypes.includes(file.type)) {
-      toast.error("Please select a JPG, PNG, WebP, or GIF image.");
-      return;
-    }
-
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error("Image size must not exceed 5 MB.");
+    try {
+      validateImage(file, "cover");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Choose a supported image.");
       return;
     }
 
@@ -117,7 +115,7 @@ export function PostForm({ existing }: { existing?: PostRow | null }) {
       if (selectedImage) {
         setUploading(true);
 
-        coverImage = await uploadCoverImage(selectedImage, user.id);
+        coverImage = await uploadImage(selectedImage, user.id, "cover");
 
         setUploading(false);
       }
@@ -180,6 +178,8 @@ export function PostForm({ existing }: { existing?: PostRow | null }) {
         );
       }
 
+      void queryClient.invalidateQueries({ queryKey: ["posts"] });
+      if (existing) void queryClient.invalidateQueries({ queryKey: ["post", existing.slug] });
       set("coverImage", coverImage);
       setSelectedImage(null);
       setPreviewUrl(null);
@@ -329,7 +329,7 @@ export function PostForm({ existing }: { existing?: PostRow | null }) {
             />
 
             <p className="mt-2 text-xs text-inksoft">
-              Choose an image from your device (maximum 5 MB).
+              JPG, PNG, or WebP up to 15 MB, compressed on upload. GIFs up to 5 MB.
             </p>
 
             {(previewUrl || draft.coverImage) && (

@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { Container, SiteLayout } from "@/components/site/SiteLayout";
 import { InitialAvatar } from "@/components/site/InitialAvatar";
 import { SafeArticle } from "@/components/site/SafeArticle";
+import { PostImage } from "@/components/site/PostImage";
 import { PostRowItem } from "@/components/site/PostCard";
 import { useAuth } from "@/hooks/useAuth";
 import { categoryLabel } from "@/lib/categories";
@@ -209,7 +210,14 @@ function PostPage() {
           </div>
 
           {cover ? (
-            <img src={cover} alt={post.title} className="mt-10 w-full rounded-xl object-cover" />
+            <PostImage
+              src={cover}
+              alt={post.title}
+              variant="article"
+              sizes="(min-width: 800px) 760px, 94vw"
+              fetchPriority="high"
+              className="mt-10 w-full rounded-xl object-cover"
+            />
           ) : null}
 
           {post.day_number ? (

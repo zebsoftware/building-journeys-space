@@ -2,7 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowRight } from "lucide-react";
 
-import heroRoad from "@/assets/hero-road.jpg";
+import heroRoadSmall from "@/assets/hero-road-480.webp";
+import heroRoad from "@/assets/hero-road-960.webp";
 import { Container, SectionHeading, SiteLayout } from "@/components/site/SiteLayout";
 import { CreativityCard, JourneyCard, PostCard, PostRowItem } from "@/components/site/PostCard";
 import { CATEGORIES } from "@/lib/categories";
@@ -29,18 +30,22 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   const { data: latest = [] } = useQuery({
+    staleTime: 60_000,
     queryKey: ["posts", "latest"],
-    queryFn: () => fetchPosts({ limit: 12 }),
+    queryFn: () => fetchPosts({ limit: 4 }),
   });
   const { data: journeys = [] } = useQuery({
+    staleTime: 60_000,
     queryKey: ["posts", "journeys", "home"],
     queryFn: () => fetchPosts({ category: "journeys", limit: 3 }),
   });
   const { data: ideas = [] } = useQuery({
+    staleTime: 60_000,
     queryKey: ["posts", "ideas", "home"],
     queryFn: () => fetchPosts({ category: "ideas", limit: 4 }),
   });
   const { data: creativity = [] } = useQuery({
+    staleTime: 60_000,
     queryKey: ["posts", "creativity", "home"],
     queryFn: () => fetchPosts({ category: "creativity", limit: 6 }),
   });
@@ -50,7 +55,7 @@ function Index() {
       {/* Hero */}
       <section className="border-b border-line">
         <Container className="grid gap-12 py-16 lg:grid-cols-[1.05fr_1fr] lg:items-center lg:py-24">
-          <div className="rise">
+          <div>
             <h1 className="font-display text-5xl leading-[1.05] tracking-tight sm:text-6xl">
               Everyone is creating something.
             </h1>
@@ -73,9 +78,14 @@ function Index() {
               </Link>
             </div>
           </div>
-          <div className="rise rise-2 overflow-hidden rounded-2xl bg-muted">
+          <div className="overflow-hidden rounded-2xl bg-muted">
             <img
               src={heroRoad}
+              srcSet={`${heroRoadSmall} 480w, ${heroRoad} 960w`}
+              sizes="(min-width: 1200px) 520px, (min-width: 1024px) 46vw, 94vw"
+              width={960}
+              height={1200}
+              fetchPriority="high"
               alt="A quiet road at golden hour"
               className="aspect-[5/4] w-full object-cover"
             />
