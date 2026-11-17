@@ -53,3 +53,15 @@ Do not give the browser privileged keys and never make role assignment accessibl
   signup, password reset, publishing and the editor before tightening them.
 - Public view counts are an approximate engagement metric. The guest view-count
   endpoint is still public and does not provide abuse-resistant analytics.
+
+## Image performance
+
+- Uploaded images are stored unchanged within the existing bucket limits. New
+  uploads use unique object keys and long cache lifetimes. Replace an image by
+  uploading a new object, not by rewriting an existing one.
+- Vercel serves responsive WebP copies of public covers and avatars. The
+  original remains the HTML image URL and fallback. GIFs and other origins
+  are served directly. Review image transformation usage in Vercel.
+- On the preview, check a published article's canonical URL and social
+  image in View Source. Confirm that a mobile browser requests a smaller
+  image variant and that the original still loads when needed.

@@ -7,12 +7,14 @@ import { toast } from "sonner";
 import { Container, SiteLayout } from "@/components/site/SiteLayout";
 import { InitialAvatar } from "@/components/site/InitialAvatar";
 import { SafeArticle } from "@/components/site/SafeArticle";
+import { PostImage } from "@/components/site/PostImage";
 import { PostRowItem } from "@/components/site/PostCard";
 import { useAuth } from "@/hooks/useAuth";
 import { categoryLabel } from "@/lib/categories";
-import { compactNumber, formatDate, timeAgo } from "@/lib/format";
+import { compactNumber, excerptFrom, formatDate, timeAgo } from "@/lib/format";
 import { coverFor } from "@/lib/post-images";
 import { fetchPostBySlug, fetchPosts } from "@/lib/posts";
+import { loadPublicArticle } from "@/lib/public-article.functions";
 import {
   addComment,
   deleteComment,
@@ -23,44 +25,91 @@ import {
   toggleLike,
 } from "@/lib/engagement";
 
+function socialImageUrl(cover: string | null, canonical: string): string | null {
+  if (!cover) return null;
+  try {
+    const image = new URL(cover, canonical);
+    return image.protocol === "https:" && !image.username && !image.password ? image.href : null;
+  } catch {
+    return null;
+  }
+}
+
 export const Route = createFileRoute("/post/$slug")({
-  head: ({ params }) => ({
-    meta: [
-      { title: `${params.slug.replace(/-/g, " ")} — The Founder` },
-      {
-        name: "description",
-        content: `Read ${params.slug.replace(/-/g, " ")} on The Founder. Discover personal stories, lessons, and creative journeys.`,
-      },
-      { property: "og:title", content: `${params.slug.replace(/-/g, " ")} — The Founder` },
-      { property: "og:description", content: "Read this original story on The Founder." },
-      { property: "og:type", content: "article" },
-      { name: "twitter:card", content: "summary_large_image" },
-    ],
-    links: [
-      {
-        rel: "canonical",
-        href: `https://thefounderblogs.vercel.app/post/${encodeURIComponent(params.slug)}`,
-      },
-    ],
-  }),
+  loader: ({ params }) => loadPublicArticle({ data: params.slug }),
+  head: ({ params, loaderData }) => {
+    const post = loaderData?.post;
+    const url = `https://thefounderblogs.com/post/${encodeURIComponent(params.slug)}`;
+    const title = post?.title ?? params.slug.replace(/-/g, " ");
+    const description = post
+      ? excerptFrom(post.subtitle || post.content, 160)
+      : "Read this original story on The Founder.";
+    const image = post ? socialImageUrl(coverFor(post), url) : null;
+
+    return {
+      meta: [
+        { title: `${title} — The Founder` },
+        { name: "description", content: description },
+        { property: "og:title", content: title },
+        { property: "og:description", content: description },
+        { property: "og:url", content: url },
+        { property: "og:type", content: "article" },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: description },
+        { name: "twitter:card", content: image ? "summary_large_image" : "summary" },
+        ...(image
+          ? [
+              { property: "og:image", content: image },
+              { name: "twitter:image", content: image },
+            ]
+          : []),
+        ...(loaderData?.status === "missing" ? [{ name: "robots", content: "noindex" }] : []),
+      ],
+      links: [{ rel: "canonical", href: url }],
+      scripts: post
+        ? [
+            {
+              type: "application/ld+json",
+              children: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "BlogPosting",
+                headline: title,
+                description,
+                mainEntityOfPage: url,
+                datePublished: post.published_at ?? post.created_at,
+                ...(image ? { image: [image] } : {}),
+                ...(post.author?.display_name
+                  ? { author: { "@type": "Person", name: post.author.display_name } }
+                  : {}),
+              }).replace(/</g, "\\u003c"),
+            },
+          ]
+        : [],
+    };
+  },
   component: PostPage,
 });
 
 function PostPage() {
+  const { post: publicPost } = Route.useLoaderData();
   const { slug } = useParams({ from: "/post/$slug" });
   const { user, profile, isAdmin, loading } = useAuth();
   const qc = useQueryClient();
   const [draft, setDraft] = useState("");
 
-  const { data: post, isLoading } = useQuery({
+  const { data: queriedPost, isLoading } = useQuery({
     queryKey: ["post", slug, user?.id ?? null],
     queryFn: () => fetchPostBySlug(slug, { publishedOnly: !user }),
     enabled: !loading,
+    initialData: !user ? (publicPost ?? undefined) : undefined,
+    staleTime: !user && publicPost ? 30_000 : 0,
   });
 
+  const post = queriedPost === undefined ? publicPost : queriedPost;
+  const published = post?.status === "published";
   useEffect(() => {
-    if (post) void incrementViews(slug);
-  }, [post, slug]);
+    if (published) void incrementViews(slug);
+  }, [published, slug]);
 
   const { data: comments = [] } = useQuery({
     queryKey: ["comments", post?.id, user?.id ?? null],
@@ -113,7 +162,7 @@ function PostPage() {
     onSuccess: () => void qc.invalidateQueries({ queryKey: ["comments", post?.id] }),
   });
 
-  if (loading || isLoading) {
+  if (!post && (loading || isLoading)) {
     return (
       <SiteLayout>
         <Container className="py-24 text-center text-sm text-inksoft">Loading…</Container>
@@ -209,7 +258,14 @@ function PostPage() {
           </div>
 
           {cover ? (
-            <img src={cover} alt={post.title} className="mt-10 w-full rounded-xl object-cover" />
+            <PostImage
+              src={cover}
+              alt={post.title}
+              variant="article"
+              sizes="(min-width: 800px) 760px, 94vw"
+              fetchPriority="high"
+              className="mt-10 w-full rounded-xl object-cover"
+            />
           ) : null}
 
           {post.day_number ? (

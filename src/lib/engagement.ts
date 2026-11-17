@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import type { Author } from "@/lib/posts";
+import { POST_SUMMARY_SELECT, type Author, type PostSummary } from "@/lib/posts";
 
 export type CommentRow = {
   id: string;
@@ -93,13 +93,11 @@ export async function toggleBookmark(postId: string, userId: string, bookmarked:
 export async function fetchBookmarkedPosts(userId: string) {
   const { data, error } = await supabase
     .from("bookmarks")
-    .select(
-      "created_at,post:posts(id,slug,title,subtitle,cover_image,category,tags,content,status,reflection_prompt,day_number,read_minutes,views,like_count,comment_count,published_at,created_at,author_id,author:profiles(id,username,display_name,avatar_url,bio))",
-    )
+    .select(`created_at,post:posts(${POST_SUMMARY_SELECT})`)
     .eq("user_id", userId)
     .order("created_at", { ascending: false });
   if (error) throw error;
-  return (data ?? []).map((row) => (row as unknown as { post: unknown }).post).filter(Boolean);
+  return (data ?? []).flatMap(({ post }) => (post ? [post as PostSummary] : []));
 }
 
 export async function incrementViews(slug: string) {

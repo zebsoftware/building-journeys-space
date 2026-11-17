@@ -8,6 +8,7 @@ import { InitialAvatar } from "@/components/site/InitialAvatar";
 import { PostRowItem } from "@/components/site/PostCard";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
+import { uploadImage } from "@/lib/cover-upload";
 import { compactNumber } from "@/lib/format";
 import { fetchAuthorPosts, fetchProfileByUsername } from "@/lib/posts";
 
@@ -92,15 +93,7 @@ function ProfilePage() {
     try {
       let avatarUrl = profile.avatar_url;
       if (avatarFile) {
-        const ext = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp" }[
-          avatarFile.type
-        ];
-        const filename = `${user.id}/${crypto.randomUUID()}.${ext}`;
-        const { error: uploadError } = await supabase.storage
-          .from("profile-avatars")
-          .upload(filename, avatarFile, { contentType: avatarFile.type, upsert: false });
-        if (uploadError) throw uploadError;
-        avatarUrl = supabase.storage.from("profile-avatars").getPublicUrl(filename).data.publicUrl;
+        avatarUrl = await uploadImage(avatarFile, user.id, "avatar");
       }
 
       const { error } = await supabase

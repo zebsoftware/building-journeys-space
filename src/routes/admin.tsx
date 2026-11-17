@@ -121,6 +121,7 @@ function AdminPage() {
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ["admin-posts"] });
       void qc.invalidateQueries({ queryKey: ["admin-stats"] });
+      void qc.invalidateQueries({ queryKey: ["posts"] });
       toast.success("Post updated");
     },
     onError: () => toast.error("Couldn't update the post."),
@@ -133,6 +134,7 @@ function AdminPage() {
     },
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: ["admin-posts"] });
+      void qc.invalidateQueries({ queryKey: ["posts"] });
       toast.success("Post deleted");
     },
   });

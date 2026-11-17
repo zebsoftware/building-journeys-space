@@ -31,7 +31,27 @@ export type PostRow = {
   author?: Author | null;
 };
 
-const POST_SELECT =
+export type PostSummary = Pick<
+  PostRow,
+  | "id"
+  | "slug"
+  | "title"
+  | "subtitle"
+  | "cover_image"
+  | "category"
+  | "status"
+  | "day_number"
+  | "read_minutes"
+  | "like_count"
+  | "comment_count"
+  | "published_at"
+  | "created_at"
+> & { author?: Pick<Author, "display_name" | "avatar_url"> | null };
+
+export const POST_SUMMARY_SELECT =
+  "id,slug,title,subtitle,cover_image,category,status,day_number,read_minutes,like_count,comment_count,published_at,created_at,author:profiles(display_name,avatar_url)";
+
+export const POST_SELECT =
   "id,slug,title,subtitle,cover_image,category,tags,content,status,reflection_prompt,day_number,read_minutes,views,like_count,comment_count,published_at,created_at,author_id,author:profiles(id,username,display_name,avatar_url,bio)";
 
 export type Sort = "latest" | "popular" | "discussed";
@@ -50,8 +70,8 @@ export async function fetchPosts(options: {
   limit?: number;
   search?: string;
   sort?: Sort;
-}): Promise<PostRow[]> {
-  let query = supabase.from("posts").select(POST_SELECT).eq("status", "published");
+}): Promise<PostSummary[]> {
+  let query = supabase.from("posts").select(POST_SUMMARY_SELECT).eq("status", "published");
 
   if (options.category) query = query.eq("category", options.category);
   if (options.search && options.search.trim()) {
@@ -63,7 +83,7 @@ export async function fetchPosts(options: {
 
   const { data, error } = await query;
   if (error) throw error;
-  return (data ?? []) as unknown as PostRow[];
+  return (data ?? []) as unknown as PostSummary[];
 }
 
 export async function fetchPostBySlug(
@@ -80,12 +100,12 @@ export async function fetchPostBySlug(
 export async function fetchAuthorPosts(
   authorId: string,
   includeDrafts = false,
-): Promise<PostRow[]> {
-  let query = supabase.from("posts").select(POST_SELECT).eq("author_id", authorId);
+): Promise<PostSummary[]> {
+  let query = supabase.from("posts").select(POST_SUMMARY_SELECT).eq("author_id", authorId);
   if (!includeDrafts) query = query.eq("status", "published");
   const { data, error } = await query.order("created_at", { ascending: false });
   if (error) throw error;
-  return (data ?? []) as unknown as PostRow[];
+  return (data ?? []) as unknown as PostSummary[];
 }
 
 export async function fetchProfileByUsername(username: string): Promise<Author | null> {
