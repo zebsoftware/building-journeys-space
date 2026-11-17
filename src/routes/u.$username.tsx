@@ -9,7 +9,6 @@ import { PostRowItem } from "@/components/site/PostCard";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { uploadImage } from "@/lib/cover-upload";
-import { validateImage } from "@/lib/image-compression";
 import { compactNumber } from "@/lib/format";
 import { fetchAuthorPosts, fetchProfileByUsername } from "@/lib/posts";
 
@@ -66,10 +65,12 @@ function ProfilePage() {
 
   function chooseAvatar(file?: File) {
     if (!file) return;
-    try {
-      validateImage(file, "avatar");
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Choose a supported image.");
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+      toast.error("Choose a JPG, PNG or WebP picture.");
+      return;
+    }
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error("Profile pictures must be 2 MB or smaller.");
       return;
     }
     setAvatarFile(file);
@@ -193,9 +194,7 @@ function ProfilePage() {
                   className="mt-3 size-20 rounded-full object-cover"
                 />
               )}
-              <p className="mt-1 text-xs text-inksoft">
-                JPG, PNG or WebP · up to 15 MB, compressed on upload
-              </p>
+              <p className="mt-1 text-xs text-inksoft">JPG, PNG or WebP · up to 2 MB</p>
               <label className="mt-5 block text-sm">
                 Display name
                 <input

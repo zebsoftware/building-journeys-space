@@ -1,3 +1,5 @@
+import { PostImage } from "@/components/site/PostImage";
+
 type Props = {
   name: string;
   url?: string | null | undefined;
@@ -15,7 +17,9 @@ export function InitialAvatar({ name, url, size = 40, className = "" }: Props) {
 
   if (url) {
     return (
-      <img
+      <PostImage
+        variant="avatar"
+        sizes={`${size}px`}
         src={url}
         alt={name}
         width={size}

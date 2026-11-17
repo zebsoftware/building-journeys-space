@@ -1,17 +1,19 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { Container, SiteLayout } from "@/components/site/SiteLayout";
-import { Editor } from "@/components/site/Editor";
 import { CATEGORIES, type CategorySlug } from "@/lib/categories";
 import { readingMinutes, slugify } from "@/lib/format";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { uploadImage } from "@/lib/cover-upload";
-import { validateImage } from "@/lib/image-compression";
+import { uploadImage, validateImage } from "@/lib/cover-upload";
 import type { PostRow } from "@/lib/posts";
+
+const Editor = lazy(() =>
+  import("@/components/site/Editor").then((module) => ({ default: module.Editor })),
+);
 
 export type PostDraft = {
   title: string;
@@ -329,7 +331,7 @@ export function PostForm({ existing }: { existing?: PostRow | null }) {
             />
 
             <p className="mt-2 text-xs text-inksoft">
-              JPG, PNG, or WebP up to 15 MB, compressed on upload. GIFs up to 5 MB.
+              Choose an image up to 5 MB. The original is kept.
             </p>
 
             {(previewUrl || draft.coverImage) && (
@@ -371,11 +373,19 @@ export function PostForm({ existing }: { existing?: PostRow | null }) {
 
         {/* BLOG CONTENT EDITOR WITH GALLERY UPLOAD */}
         <div className="mt-8">
-          <Editor
-            value={draft.content}
-            onChange={(html) => set("content", html)}
-            onUploadingChange={handleEditorUploading}
-          />
+          <Suspense
+            fallback={
+              <p role="status" className="min-h-48 text-sm text-inksoft">
+                Loading editor…
+              </p>
+            }
+          >
+            <Editor
+              value={draft.content}
+              onChange={(html) => set("content", html)}
+              onUploadingChange={handleEditorUploading}
+            />
+          </Suspense>
 
           {editorUploading && (
             <p className="mt-3 text-sm text-inksoft">

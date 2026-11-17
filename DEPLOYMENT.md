@@ -56,14 +56,12 @@ Do not give the browser privileged keys and never make role assignment accessibl
 
 ## Image performance
 
-- Still images are resized before upload. Covers use up to 1600 px on the longest
-  side, inline images 1200 px and avatars 384 px. Smaller originals and supported
-  animated images are preserved where appropriate.
-- New uploads retain their random object keys and use long browser caching.
-  Replace an image through the editor rather than rewriting an existing object.
-- Vercel's image optimizer is enabled for this project's public Supabase cover
-  URLs. GIFs and other origins are served directly. If optimization fails, the
-  browser retries the original. Review image transformation usage in Vercel.
-- On the preview, open a post with an existing cover and confirm the image
-  request returns successfully. Upload a large JPEG in a test post and check
-  the stored file dimensions, size, and content type in Supabase Storage.
+- Uploaded images are stored unchanged within the existing bucket limits. New
+  uploads use unique object keys and long cache lifetimes. Replace an image by
+  uploading a new object, not by rewriting an existing one.
+- Vercel serves responsive WebP copies of public covers and avatars. The
+  original remains the HTML image URL and fallback. GIFs and other origins
+  are served directly. Review image transformation usage in Vercel.
+- On the preview, check a published article's canonical URL and social
+  image in View Source. Confirm that a mobile browser requests a smaller
+  image variant and that the original still loads when needed.
