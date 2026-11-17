@@ -34,7 +34,7 @@ export function PostImage({ src, variant = "card", sizes, ...props }: Props) {
       decoding="async"
       {...props}
       ref={imageRef}
-      src={src}
+      src={optimized ? optimizedImageUrl(src, candidates[0]) : src}
       srcSet={
         optimized
           ? candidates.map((w) => `${optimizedImageUrl(src, w)} ${w}w`).join(", ")

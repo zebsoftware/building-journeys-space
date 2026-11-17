@@ -79,3 +79,12 @@ Do not give the browser privileged keys and never make role assignment accessibl
 3. Use **Production → Mobile** to view real-user data as visits come in. Compare
    the same public URLs in PageSpeed Insights after deployment. The local
    tests and the documentation's example dashboard are not production data.
+
+## Homepage delivery
+
+The homepage streams its hero and navigation before the public post summaries
+are ready. Only published summaries are requested from Supabase with the public
+key, and the feed requests run in parallel with a bounded deadline. Do not add
+shared caching to the HTML because its CSP nonce is unique per response.
+The local font files retain their original Latin and extended glyph coverage,
+with the weight axes limited to the ranges used by the stylesheet.

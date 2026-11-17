@@ -1,4 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
+import { POST_SELECT } from "@/lib/post-select";
+import { fetchPublicPostRows } from "@/lib/public-posts.server";
 import type { PostRow } from "@/lib/posts";
 
 type Result =
@@ -11,31 +13,13 @@ export const loadPublicArticle = createServerFn({ method: "GET" })
     return slug;
   })
   .handler(async ({ data: slug }): Promise<Result> => {
-    // This loader always uses public credentials, never the current user's token
-    // or a service key. Drafts can only load through the authenticated client.
-    const base = process.env["SUPABASE_URL"] || import.meta.env["VITE_SUPABASE_URL"];
-    const key =
-      process.env["SUPABASE_PUBLISHABLE_KEY"] || import.meta.env["VITE_SUPABASE_PUBLISHABLE_KEY"];
-    if (!base || !key) return { status: "unavailable", post: null };
-    try {
-      const { POST_SELECT } = await import("@/lib/posts");
-      const url = new URL("/rest/v1/posts", base);
-      url.search = new URLSearchParams({
-        select: POST_SELECT,
-        slug: `eq.${slug}`,
-        status: "eq.published",
-        limit: "1",
-      }).toString();
-      const headers: Record<string, string> = { apikey: key };
-      if (key.startsWith("eyJ")) headers["Authorization"] = `Bearer ${key}`;
-      const response = await fetch(url, { headers, signal: AbortSignal.timeout(1500) });
-      if (!response.ok) return { status: "unavailable", post: null };
-      const rows = (await response.json()) as PostRow[];
-      const post = rows[0];
-      return post?.status === "published"
-        ? { status: "published", post }
-        : { status: "missing", post: null };
-    } catch {
-      return { status: "unavailable", post: null };
-    }
+    const rows = await fetchPublicPostRows<PostRow>(
+      { select: POST_SELECT, slug: `eq.${slug}`, limit: "1" },
+      AbortSignal.timeout(1500),
+    );
+    if (!rows) return { status: "unavailable", post: null };
+    const post = rows[0];
+    return post?.status === "published"
+      ? { status: "published", post }
+      : { status: "missing", post: null };
   });

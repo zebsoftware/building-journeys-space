@@ -1,5 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { Await, createFileRoute, Link } from "@tanstack/react-router";
+import { Suspense } from "react";
 import { ArrowRight } from "lucide-react";
 
 import heroRoadSmall from "@/assets/hero-road-480.webp";
@@ -9,7 +9,7 @@ import heroFont from "@/assets/fonts/fraunces-latin.woff2?url";
 import { Container, SectionHeading, SiteLayout } from "@/components/site/SiteLayout";
 import { CreativityCard, JourneyCard, PostCard, PostRowItem } from "@/components/site/PostCard";
 import { CATEGORIES } from "@/lib/categories";
-import { fetchPosts } from "@/lib/posts";
+import { loadPublicHome } from "@/lib/public-home.functions";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -30,30 +30,12 @@ export const Route = createFileRoute("/")({
       },
     ],
   }),
+  loader: () => ({ feed: loadPublicHome() }),
   component: Index,
 });
 
 function Index() {
-  const { data: latest = [] } = useQuery({
-    staleTime: 60_000,
-    queryKey: ["posts", "latest"],
-    queryFn: () => fetchPosts({ limit: 4 }),
-  });
-  const { data: journeys = [] } = useQuery({
-    staleTime: 60_000,
-    queryKey: ["posts", "journeys", "home"],
-    queryFn: () => fetchPosts({ category: "journeys", limit: 3 }),
-  });
-  const { data: ideas = [] } = useQuery({
-    staleTime: 60_000,
-    queryKey: ["posts", "ideas", "home"],
-    queryFn: () => fetchPosts({ category: "ideas", limit: 4 }),
-  });
-  const { data: creativity = [] } = useQuery({
-    staleTime: 60_000,
-    queryKey: ["posts", "creativity", "home"],
-    queryFn: () => fetchPosts({ category: "creativity", limit: 6 }),
-  });
+  const { feed } = Route.useLoaderData();
 
   return (
     <SiteLayout>
@@ -120,95 +102,17 @@ function Index() {
         </Container>
       </section>
 
-      {/* Featured */}
-      <section className="border-b border-line">
-        <Container className="py-16">
-          <SectionHeading
-            eyebrow="Featured"
-            title="Fresh from the community"
-            action={
-              <Link to="/search" className="underline-link text-sm text-inksoft">
-                Browse all
-              </Link>
-            }
-          />
-          {latest.length ? (
-            <div className="grid items-stretch gap-8 md:grid-cols-2">
-              {latest.slice(0, 4).map((post) => (
-                <PostCard key={post.id} post={post} featured />
-              ))}
-            </div>
-          ) : (
-            <p className="text-sm text-inksoft">No posts published yet.</p>
-          )}
-        </Container>
-      </section>
-
-      {/* Journeys */}
-      {journeys.length ? (
-        <section className="border-b border-line bg-card">
+      <Suspense
+        fallback={
           <Container className="py-16">
-            <SectionHeading
-              eyebrow="In progress"
-              title="Journeys worth following"
-              action={
-                <Link to="/journeys" className="underline-link text-sm text-inksoft">
-                  All journeys
-                </Link>
-              }
-            />
-            <div className="grid gap-6 md:grid-cols-3">
-              {journeys.map((post) => (
-                <JourneyCard key={post.id} post={post} />
-              ))}
-            </div>
+            <p className="text-sm text-inksoft" role="status">
+              Loading community posts…
+            </p>
           </Container>
-        </section>
-      ) : null}
-
-      {/* Ideas */}
-      {ideas.length ? (
-        <section className="border-b border-line">
-          <Container className="py-16">
-            <SectionHeading
-              eyebrow="Thinking out loud"
-              title="Ideas in the open"
-              action={
-                <Link to="/ideas" className="underline-link text-sm text-inksoft">
-                  All ideas
-                </Link>
-              }
-            />
-            <div className="grid gap-x-10 md:grid-cols-2">
-              {ideas.map((post) => (
-                <PostRowItem key={post.id} post={post} />
-              ))}
-            </div>
-          </Container>
-        </section>
-      ) : null}
-
-      {/* Creativity */}
-      {creativity.length ? (
-        <section className="border-b border-line">
-          <Container className="py-16">
-            <SectionHeading
-              eyebrow="Made by hand"
-              title="Creativity"
-              action={
-                <Link to="/creativity" className="underline-link text-sm text-inksoft">
-                  All work
-                </Link>
-              }
-            />
-            <div className="columns-1 gap-6 sm:columns-2 lg:columns-3">
-              {creativity.map((post) => (
-                <CreativityCard key={post.id} post={post} />
-              ))}
-            </div>
-          </Container>
-        </section>
-      ) : null}
+        }
+      >
+        <Await promise={feed}>{(posts) => <HomeFeed posts={posts} />}</Await>
+      </Suspense>
 
       {/* About The Founder */}
       <section id="about" className="border-b border-line bg-card">
@@ -260,5 +164,104 @@ function Index() {
         </Container>
       </section>
     </SiteLayout>
+  );
+}
+
+function HomeFeed({ posts }: { posts: Awaited<ReturnType<typeof loadPublicHome>> }) {
+  const { latest, journeys, ideas, creativity } = posts;
+  return (
+    <>
+      {/* Featured */}
+      <section className="border-b border-line">
+        <Container className="py-16">
+          <SectionHeading
+            eyebrow="Featured"
+            title="Fresh from the community"
+            action={
+              <Link to="/search" className="underline-link text-sm text-inksoft">
+                Browse all
+              </Link>
+            }
+          />
+          {latest?.length ? (
+            <div className="grid items-stretch gap-8 md:grid-cols-2">
+              {latest.map((post) => (
+                <PostCard key={post.id} post={post} featured />
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-inksoft">
+              {latest === null ? "Posts are temporarily unavailable." : "No posts published yet."}
+            </p>
+          )}
+        </Container>
+      </section>
+
+      {/* Journeys */}
+      {journeys?.length ? (
+        <section className="border-b border-line bg-card">
+          <Container className="py-16">
+            <SectionHeading
+              eyebrow="In progress"
+              title="Journeys worth following"
+              action={
+                <Link to="/journeys" className="underline-link text-sm text-inksoft">
+                  All journeys
+                </Link>
+              }
+            />
+            <div className="grid gap-6 md:grid-cols-3">
+              {journeys.map((post) => (
+                <JourneyCard key={post.id} post={post} />
+              ))}
+            </div>
+          </Container>
+        </section>
+      ) : null}
+
+      {/* Ideas */}
+      {ideas?.length ? (
+        <section className="border-b border-line">
+          <Container className="py-16">
+            <SectionHeading
+              eyebrow="Thinking out loud"
+              title="Ideas in the open"
+              action={
+                <Link to="/ideas" className="underline-link text-sm text-inksoft">
+                  All ideas
+                </Link>
+              }
+            />
+            <div className="grid gap-x-10 md:grid-cols-2">
+              {ideas.map((post) => (
+                <PostRowItem key={post.id} post={post} />
+              ))}
+            </div>
+          </Container>
+        </section>
+      ) : null}
+
+      {/* Creativity */}
+      {creativity?.length ? (
+        <section className="border-b border-line">
+          <Container className="py-16">
+            <SectionHeading
+              eyebrow="Made by hand"
+              title="Creativity"
+              action={
+                <Link to="/creativity" className="underline-link text-sm text-inksoft">
+                  All work
+                </Link>
+              }
+            />
+            <div className="columns-1 gap-6 sm:columns-2 lg:columns-3">
+              {creativity.map((post) => (
+                <CreativityCard key={post.id} post={post} />
+              ))}
+            </div>
+          </Container>
+        </section>
+      ) : null}
+    </>
   );
 }

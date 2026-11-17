@@ -1,5 +1,8 @@
 import { supabase } from "@/integrations/supabase/client";
+import { POST_SELECT, POST_SUMMARY_SELECT } from "@/lib/post-select";
 import type { CategorySlug } from "@/lib/categories";
+
+export { POST_SELECT, POST_SUMMARY_SELECT } from "@/lib/post-select";
 
 export type Author = {
   id: string;
@@ -47,12 +50,6 @@ export type PostSummary = Pick<
   | "published_at"
   | "created_at"
 > & { author?: Pick<Author, "display_name" | "avatar_url"> | null };
-
-export const POST_SUMMARY_SELECT =
-  "id,slug,title,subtitle,cover_image,category,status,day_number,read_minutes,like_count,comment_count,published_at,created_at,author:profiles(display_name,avatar_url)";
-
-export const POST_SELECT =
-  "id,slug,title,subtitle,cover_image,category,tags,content,status,reflection_prompt,day_number,read_minutes,views,like_count,comment_count,published_at,created_at,author_id,author:profiles(id,username,display_name,avatar_url,bio)";
 
 export type Sort = "latest" | "popular" | "discussed";
 

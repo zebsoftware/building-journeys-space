@@ -18,7 +18,9 @@ function Meta({ post }: { post: PostSummary }) {
       />
       <span className="text-ink">{post.author?.display_name ?? "Anonymous"}</span>
       <span aria-hidden>·</span>
-      <span>{timeAgo(post.published_at ?? post.created_at)}</span>
+      <time dateTime={post.published_at ?? post.created_at} suppressHydrationWarning>
+        {timeAgo(post.published_at ?? post.created_at)}
+      </time>
       <span aria-hidden>·</span>
       <span>{post.read_minutes} min</span>
       <span className="ml-auto flex items-center gap-3">
@@ -44,7 +46,7 @@ export function PostCard({ post, featured = false }: { post: PostSummary; featur
             <PostImage
               src={cover}
               alt={post.title}
-              sizes="(min-width: 1024px) 560px, (min-width: 768px) 48vw, 94vw"
+              sizes="(min-width: 1200px) 560px, (min-width: 768px) calc(50vw - 40px), calc(100vw - 48px)"
               loading="lazy"
               className={`zoom-media w-full object-cover ${featured ? "aspect-[16/10]" : "aspect-[4/3]"}`}
             />
@@ -109,7 +111,7 @@ export function CreativityCard({ post }: { post: PostSummary }) {
             <PostImage
               src={cover}
               alt={post.title}
-              sizes="(min-width: 1024px) 560px, (min-width: 768px) 48vw, 94vw"
+              sizes="(min-width: 1200px) 368px, (min-width: 1024px) calc(33.33vw - 32px), (min-width: 640px) calc(50vw - 36px), calc(100vw - 48px)"
               loading="lazy"
               className="zoom-media aspect-[4/3] w-full object-cover"
             />
