@@ -48,13 +48,14 @@ export const Route = createFileRoute("/post/$slug")({
 
 function PostPage() {
   const { slug } = useParams({ from: "/post/$slug" });
-  const { user, profile, isAdmin } = useAuth();
+  const { user, profile, isAdmin, loading } = useAuth();
   const qc = useQueryClient();
   const [draft, setDraft] = useState("");
 
   const { data: post, isLoading } = useQuery({
-    queryKey: ["post", slug],
-    queryFn: () => fetchPostBySlug(slug),
+    queryKey: ["post", slug, user?.id ?? null],
+    queryFn: () => fetchPostBySlug(slug, { publishedOnly: !user }),
+    enabled: !loading,
   });
 
   useEffect(() => {
@@ -62,7 +63,7 @@ function PostPage() {
   }, [post, slug]);
 
   const { data: comments = [] } = useQuery({
-    queryKey: ["comments", post?.id],
+    queryKey: ["comments", post?.id, user?.id ?? null],
     queryFn: () => fetchComments(post!.id),
     enabled: Boolean(post?.id),
   });
@@ -112,7 +113,7 @@ function PostPage() {
     onSuccess: () => void qc.invalidateQueries({ queryKey: ["comments", post?.id] }),
   });
 
-  if (isLoading) {
+  if (loading || isLoading) {
     return (
       <SiteLayout>
         <Container className="py-24 text-center text-sm text-inksoft">Loading…</Container>

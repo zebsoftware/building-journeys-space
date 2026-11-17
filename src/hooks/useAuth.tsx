@@ -1,4 +1,12 @@
-import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -31,8 +39,12 @@ const AuthContext = createContext<AuthValue>({
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
-  const [profile, setProfile] = useState<Profile | null>(null);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [identity, setIdentity] = useState<{
+    userId: string;
+    profile: Profile | null;
+    isAdmin: boolean;
+  } | null>(null);
+  const profileRequest = useRef(0);
   const [loading, setLoading] = useState(true);
 
   const userId = session?.user.id ?? null;
@@ -51,17 +63,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const loadProfile = useMemo(
     () => async (id: string | null) => {
+      const request = ++profileRequest.current;
       if (!id) {
-        setProfile(null);
-        setIsAdmin(false);
+        setIdentity(null);
         return;
       }
       const [{ data: profileRow }, { data: roleRows }] = await Promise.all([
         supabase.from("profiles").select("*").eq("id", id).maybeSingle(),
         supabase.from("user_roles").select("role").eq("user_id", id),
       ]);
-      setProfile((profileRow as Profile | null) ?? null);
-      setIsAdmin(Boolean(roleRows?.some((row) => row.role === "admin")));
+      if (request !== profileRequest.current) return;
+      setIdentity({
+        userId: id,
+        profile: (profileRow as Profile | null) ?? null,
+        isAdmin: Boolean(roleRows?.some((row) => row.role === "admin")),
+      });
     },
     [],
   );
@@ -73,8 +89,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const value: AuthValue = {
     session,
     user: session?.user ?? null,
-    profile,
-    isAdmin,
+    profile: identity?.userId === userId ? identity.profile : null,
+    isAdmin: identity?.userId === userId ? identity.isAdmin : false,
     loading,
     refreshProfile: () => loadProfile(userId),
   };
