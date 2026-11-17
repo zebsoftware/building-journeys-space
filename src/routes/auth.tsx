@@ -56,7 +56,7 @@ function AuthPage() {
           password,
           options: {
             emailRedirectTo: window.location.origin,
-            data: { display_name: displayName.trim() || email.split("@")[0] },
+            data: { display_name: displayName.trim() || "New Writer" },
           },
         });
         if (error) throw error;

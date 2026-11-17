@@ -36,7 +36,7 @@ function AdminPage() {
   const qc = useQueryClient();
 
   const { data: siteStats } = useQuery({
-    queryKey: ["admin-stats"],
+    queryKey: ["admin-stats", user?.id],
     enabled: isAdmin,
     queryFn: async () => {
       const { data, error } = await supabase.rpc("admin_site_stats" as never);
@@ -61,7 +61,7 @@ function AdminPage() {
   });
 
   const { data: posts = [] } = useQuery({
-    queryKey: ["admin-posts"],
+    queryKey: ["admin-posts", user?.id],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("posts")
@@ -75,7 +75,7 @@ function AdminPage() {
   });
 
   const { data: reports = [] } = useQuery({
-    queryKey: ["admin-reports"],
+    queryKey: ["admin-reports", user?.id],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("reports")
@@ -88,7 +88,7 @@ function AdminPage() {
   });
 
   const { data: comments = [] } = useQuery({
-    queryKey: ["admin-comments"],
+    queryKey: ["admin-comments", user?.id],
     enabled: isAdmin,
     queryFn: async () => {
       const { data, error } = await supabase

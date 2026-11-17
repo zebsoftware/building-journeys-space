@@ -5,6 +5,7 @@ import { PostForm } from "@/components/site/PostForm";
 import { Container, SiteLayout } from "@/components/site/SiteLayout";
 import { supabase } from "@/integrations/supabase/client";
 import type { PostRow } from "@/lib/posts";
+import { useAuth } from "@/hooks/useAuth";
 
 export const Route = createFileRoute("/edit/$id")({
   head: () => ({
@@ -21,8 +22,10 @@ export const Route = createFileRoute("/edit/$id")({
 
 function EditPage() {
   const { id } = useParams({ from: "/edit/$id" });
+  const { user, isAdmin, loading } = useAuth();
   const { data, isLoading } = useQuery({
-    queryKey: ["post-edit", id],
+    queryKey: ["post-edit", id, user?.id],
+    enabled: !loading && Boolean(user),
     queryFn: async () => {
       const { data: row, error } = await supabase
         .from("posts")
@@ -34,7 +37,7 @@ function EditPage() {
     },
   });
 
-  if (isLoading) {
+  if (loading || isLoading) {
     return (
       <SiteLayout>
         <Container className="py-24 text-center text-sm text-inksoft">Loading…</Container>
@@ -42,7 +45,7 @@ function EditPage() {
     );
   }
 
-  if (!data) {
+  if (!user || !data || (data.author_id !== user.id && !isAdmin)) {
     return (
       <SiteLayout>
         <Container className="py-24 text-center">

@@ -1,4 +1,3 @@
-
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,
@@ -36,13 +35,9 @@ function NotFoundComponent() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
-        <h1 className="text-7xl font-bold text-foreground">
-          404
-        </h1>
+        <h1 className="text-7xl font-bold text-foreground">404</h1>
 
-        <h2 className="mt-4 text-xl font-semibold text-foreground">
-          Page not found
-        </h2>
+        <h2 className="mt-4 text-xl font-semibold text-foreground">Page not found</h2>
 
         <p className="mt-2 text-sm text-muted-foreground">
           The page you're looking for doesn't exist or has been moved.
@@ -61,13 +56,7 @@ function NotFoundComponent() {
   );
 }
 
-function ErrorComponent({
-  error,
-  reset,
-}: {
-  error: unknown;
-  reset: () => void;
-}) {
+function ErrorComponent({ error, reset }: { error: unknown; reset: () => void }) {
   const router = useRouter();
 
   useEffect(() => {
@@ -75,9 +64,7 @@ function ErrorComponent({
       error instanceof Error
         ? error
         : new Error(
-            typeof error === "string"
-              ? error
-              : "An unexpected application error occurred.",
+            typeof error === "string" ? error : "An unexpected application error occurred.",
           );
 
     console.error("Application error:", normalizedError);
@@ -163,8 +150,7 @@ export const Route = createRootRouteWithContext<{
       },
       {
         property: "og:description",
-        content:
-          "Stories, journeys, ideas, creativity and growth from people creating in public.",
+        content: "Stories, journeys, ideas, creativity and growth from people creating in public.",
       },
       {
         property: "og:type",

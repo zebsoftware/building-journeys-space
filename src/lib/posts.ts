@@ -66,12 +66,13 @@ export async function fetchPosts(options: {
   return (data ?? []) as unknown as PostRow[];
 }
 
-export async function fetchPostBySlug(slug: string): Promise<PostRow | null> {
-  const { data, error } = await supabase
-    .from("posts")
-    .select(POST_SELECT)
-    .eq("slug", slug)
-    .maybeSingle();
+export async function fetchPostBySlug(
+  slug: string,
+  { publishedOnly = false } = {},
+): Promise<PostRow | null> {
+  let query = supabase.from("posts").select(POST_SELECT).eq("slug", slug);
+  if (publishedOnly) query = query.eq("status", "published");
+  const { data, error } = await query.maybeSingle();
   if (error) throw error;
   return (data as unknown as PostRow) ?? null;
 }

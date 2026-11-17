@@ -50,6 +50,8 @@ const DROP_CONTENTS = new Set([
 ]);
 
 const MAX_NODES = 5000;
+const MAX_DEPTH = 64;
+const MAX_HTML_LENGTH = 1_000_000;
 
 function hasControlCharacters(value: string): boolean {
   return Array.from(value).some((char) => {
@@ -65,40 +67,36 @@ function safeUrl(raw: string, image = false): string | undefined {
     return undefined;
   }
 
-  // Block protocol-relative URLs.
-  if (candidate.startsWith("//")) {
+  if (candidate.includes("\\") || candidate.startsWith("//")) {
     return undefined;
   }
 
+  if (candidate.startsWith("/")) return candidate;
+
   try {
-    const url = new URL(candidate, "https://the-founder.invalid");
-
-    if (image) {
-      if (!["https:", "http:"].includes(url.protocol)) {
-        return undefined;
-      }
-    } else if (!["https:", "http:", "mailto:"].includes(url.protocol)) {
-      return undefined;
+    const url = new URL(candidate);
+    if (url.username || url.password) return undefined;
+    if (url.protocol === "https:" || (!image && ["http:", "mailto:"].includes(url.protocol))) {
+      return url.href;
     }
-
-    // Allow valid root-relative paths, but not unknown relative URLs.
-    if (url.hostname === "the-founder.invalid") {
-      return candidate.startsWith("/") && !candidate.startsWith("//") ? candidate : undefined;
-    }
-
-    return candidate;
   } catch {
     return undefined;
   }
+
+  return undefined;
 }
 
 function parseSafeHtml(html: string): ReactNode {
-  const doc = new DOMParser().parseFromString(html, "text/html");
+  if (html.length > MAX_HTML_LENGTH) return "This article exceeds the display limit.";
+
+  // Template contents stay inert, including resources in nodes we discard.
+  const template = document.createElement("template");
+  template.innerHTML = html;
 
   let remaining = MAX_NODES;
 
-  const render = (node: Node, key: number): ReactNode => {
-    if (remaining-- <= 0) {
+  const render = (node: Node, key: number, depth: number): ReactNode => {
+    if (remaining-- <= 0 || depth > MAX_DEPTH) {
       return null;
     }
 
@@ -122,7 +120,7 @@ function parseSafeHtml(html: string): ReactNode {
     if (tag === "br") return <br key={key} />;
     if (tag === "hr") return <hr key={key} />;
 
-    const children = Array.from(element.childNodes).map(render);
+    const children = renderChildren(element.childNodes, depth + 1);
 
     // Unknown elements cannot retain attributes.
     if (!ALLOWED.has(tag)) {
@@ -152,6 +150,7 @@ function parseSafeHtml(html: string): ReactNode {
           src={src}
           alt={(element.getAttribute("alt") ?? "").slice(0, 200)}
           loading="lazy"
+          referrerPolicy="no-referrer"
         />
       ) : null;
     }
@@ -162,7 +161,15 @@ function parseSafeHtml(html: string): ReactNode {
     return <Tag key={key}>{children}</Tag>;
   };
 
-  return Array.from(doc.body.childNodes).map(render);
+  const renderChildren = (nodes: NodeListOf<ChildNode>, depth: number) => {
+    const children: ReactNode[] = [];
+    for (let index = 0; index < nodes.length && remaining > 0; index++) {
+      children.push(render(nodes.item(index), index, depth));
+    }
+    return children;
+  };
+
+  return renderChildren(template.content.childNodes, 0);
 }
 
 export function SafeArticle({ html }: { html: string }) {

@@ -35,3 +35,21 @@ Do not give the browser privileged keys and never make role assignment accessibl
 7. Check browser console, server logs, mobile layout and metadata.
 
 **Do not claim production-ready until build, RLS, XSS, and end-to-end deployment checks pass.**
+
+## Browser and database security rollout
+
+- Apply the `20261117000000_lock_down_public_content.sql` migration to staging first.
+  It preserves users and content, but previous profile links using email-based
+  usernames will change. Those emails may still be in old links or search caches.
+- Run `migration-package/verification/security_regression.sql` on a disposable
+  staging database as the migration owner. The test uses synthetic accounts and
+  rolls its changes back.
+- In hosted Supabase Auth, separately match the app's signup/reset password
+  requirements and review email and authentication rate limits. Check the
+  Vercel project's Supabase URL before selecting a target for the migration.
+- After deployment, verify the response headers on the real production host.
+  The enforced policy blocks embedding and plug-in objects. The stricter script
+  and resource directives only report violations in the browser console. Test
+  signup, password reset, publishing and the editor before tightening them.
+- Public view counts are an approximate engagement metric. The guest view-count
+  endpoint is still public and does not provide abuse-resistant analytics.
