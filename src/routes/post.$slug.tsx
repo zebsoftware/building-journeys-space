@@ -262,7 +262,7 @@ function PostPage() {
               src={cover}
               alt={post.title}
               variant="article"
-              sizes="(min-width: 800px) 760px, 94vw"
+              sizes="(min-width: 760px) 712px, calc(100vw - 48px)"
               fetchPriority="high"
               className="mt-10 w-full rounded-xl object-cover"
             />

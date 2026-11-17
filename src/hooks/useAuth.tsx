@@ -8,7 +8,6 @@ import {
   type ReactNode,
 } from "react";
 import type { Session, User } from "@supabase/supabase-js";
-import { supabase } from "@/integrations/supabase/client";
 
 export type Profile = {
   id: string;
@@ -50,15 +49,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const userId = session?.user.id ?? null;
 
   useEffect(() => {
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, nextSession) => {
-      setSession(nextSession);
-      setLoading(false);
-    });
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
-      setLoading(false);
-    });
-    return () => sub.subscription.unsubscribe();
+    let active = true;
+    let unsubscribe: (() => void) | undefined;
+    void import("@/integrations/supabase/client")
+      .then(({ supabase }) => {
+        if (!active) return;
+        // Supabase reports the initial session as well as subsequent auth events.
+        const { data } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+          if (!active) return;
+          setSession(nextSession);
+          setLoading(false);
+        });
+        unsubscribe = () => data.subscription.unsubscribe();
+      })
+      .catch((error: unknown) => {
+        console.error("Could not initialize authentication", error);
+        if (active) setLoading(false);
+      });
+    return () => {
+      active = false;
+      unsubscribe?.();
+    };
   }, []);
 
   const loadProfile = useMemo(
@@ -68,6 +79,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setIdentity(null);
         return;
       }
+      const { supabase } = await import("@/integrations/supabase/client");
+      if (request !== profileRequest.current) return;
       const [{ data: profileRow }, { data: roleRows }] = await Promise.all([
         supabase.from("profiles").select("*").eq("id", id).maybeSingle(),
         supabase.from("user_roles").select("role").eq("user_id", id),
