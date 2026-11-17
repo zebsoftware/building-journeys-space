@@ -1,31 +1,16 @@
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import { Menu, Moon, PenLine, Search, Sun, X } from "lucide-react";
-import { useState } from "react";
+import { lazy, Suspense, useState } from "react";
 
 import { CATEGORIES } from "@/lib/categories";
 import { useAuth } from "@/hooks/useAuth";
 import { useTheme } from "@/lib/theme";
-import { supabase } from "@/integrations/supabase/client";
-import { InitialAvatar } from "@/components/site/InitialAvatar";
-// import founderLogo from "@/assets/founder-logo.png.asset.json";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+const AccountMenu = lazy(() => import("./AccountMenu"));
 
 export function Header() {
   const { theme, toggle } = useTheme();
-  const { user, profile, isAdmin } = useAuth();
+  const { user } = useAuth();
   const [open, setOpen] = useState(false);
-  const navigate = useNavigate();
-
-  const signOut = async () => {
-    await supabase.auth.signOut();
-    void navigate({ to: "/" });
-  };
 
   return (
     <header className="sticky top-0 z-50 border-b border-line bg-background/85 backdrop-blur-md">
@@ -36,13 +21,18 @@ export function Header() {
         >
           <img
             src="/founder-logo.png"
-            alt="The Founder"
+            alt=""
+            width={40}
+            height={40}
             className="size-10 rounded-sm object-contain"
           />
           <span>The Founder</span>
         </Link>
 
-        <nav className="hidden items-center gap-6 text-sm text-inksoft lg:flex">
+        <nav
+          aria-label="Main navigation"
+          className="hidden items-center gap-6 text-sm text-inksoft lg:flex"
+        >
           {CATEGORIES.map((category) => (
             <Link
               key={category.slug}
@@ -73,40 +63,11 @@ export function Header() {
           </button>
 
           {user ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger className="ml-1 flex items-center gap-2 rounded-full border border-line py-1 pl-1 pr-3 text-sm outline-none ring-offset-2 transition-colors hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring">
-                <InitialAvatar
-                  name={profile?.display_name ?? "You"}
-                  url={profile?.avatar_url}
-                  size={32}
-                />
-                <span className="hidden sm:inline">Profile</span>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-52">
-                {profile?.username ? (
-                  <DropdownMenuItem asChild>
-                    <Link to="/u/$username" params={{ username: profile.username }}>
-                      My profile
-                    </Link>
-                  </DropdownMenuItem>
-                ) : (
-                  <DropdownMenuItem disabled>Loading profile…</DropdownMenuItem>
-                )}
-                <DropdownMenuItem asChild>
-                  <Link to="/bookmarks">Bookmarks</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link to="/write">Write a post</Link>
-                </DropdownMenuItem>
-                {isAdmin ? (
-                  <DropdownMenuItem asChild>
-                    <Link to="/admin">Admin dashboard</Link>
-                  </DropdownMenuItem>
-                ) : null}
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onSelect={() => void signOut()}>Sign out</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <Suspense
+              fallback={<span aria-hidden="true" className="ml-1 size-9 rounded-full bg-muted" />}
+            >
+              <AccountMenu />
+            </Suspense>
           ) : (
             <Link
               to="/auth"
@@ -128,6 +89,8 @@ export function Header() {
             type="button"
             className="ml-1 grid size-9 place-items-center rounded-full text-inksoft lg:hidden"
             aria-label="Menu"
+            aria-expanded={open}
+            aria-controls="mobile-menu"
             onClick={() => setOpen((v) => !v)}
           >
             {open ? <X className="size-5" /> : <Menu className="size-5" />}
@@ -135,38 +98,41 @@ export function Header() {
         </div>
       </div>
 
-      {open ? (
-        <div className="border-t border-line bg-background lg:hidden">
-          <div className="mx-auto flex max-w-[1200px] flex-col gap-1 px-6 py-4">
-            {CATEGORIES.map((category) => (
-              <Link
-                key={category.slug}
-                to={category.path}
-                onClick={() => setOpen(false)}
-                className="rounded-lg px-2 py-2 text-sm text-inksoft hover:bg-muted hover:text-ink"
-              >
-                {category.label}
-              </Link>
-            ))}
+      <nav
+        id="mobile-menu"
+        aria-label="Mobile navigation"
+        hidden={!open}
+        className="border-t border-line bg-background lg:hidden"
+      >
+        <div className="mx-auto flex max-w-[1200px] flex-col gap-1 px-6 py-4">
+          {CATEGORIES.map((category) => (
             <Link
-              to="/write"
+              key={category.slug}
+              to={category.path}
               onClick={() => setOpen(false)}
               className="rounded-lg px-2 py-2 text-sm text-inksoft hover:bg-muted hover:text-ink"
             >
-              Write a post
+              {category.label}
             </Link>
-            {!user ? (
-              <Link
-                to="/auth"
-                onClick={() => setOpen(false)}
-                className="rounded-lg px-2 py-2 text-sm text-inksoft hover:bg-muted hover:text-ink"
-              >
-                Sign in
-              </Link>
-            ) : null}
-          </div>
+          ))}
+          <Link
+            to="/write"
+            onClick={() => setOpen(false)}
+            className="rounded-lg px-2 py-2 text-sm text-inksoft hover:bg-muted hover:text-ink"
+          >
+            Write a post
+          </Link>
+          {!user ? (
+            <Link
+              to="/auth"
+              onClick={() => setOpen(false)}
+              className="rounded-lg px-2 py-2 text-sm text-inksoft hover:bg-muted hover:text-ink"
+            >
+              Sign in
+            </Link>
+          ) : null}
         </div>
-      ) : null}
+      </nav>
     </header>
   );
 }

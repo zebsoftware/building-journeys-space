@@ -51,30 +51,19 @@ export function Footer() {
 
           {/* Small social icons */}
           <div className="flex items-center gap-3">
-            {SOCIALS.map(({ label, href, Icon }) =>
-              href ? (
-                <a
-                  key={label}
-                  href={href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={label}
-                  title={label}
-                  className="text-inksoft transition-colors hover:text-foreground"
-                >
-                  <Icon className="size-[16px]" />
-                </a>
-              ) : (
-                <span
-                  key={label}
-                  title={`${label} coming soon`}
-                  aria-label={`${label} coming soon`}
-                  className="cursor-default text-inksoft opacity-50"
-                >
-                  <Icon className="size-[16px]" />
-                </span>
-              ),
-            )}
+            {SOCIALS.filter(({ href }) => Boolean(href)).map(({ label, href, Icon }) => (
+              <a
+                key={label}
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={label}
+                title={label}
+                className="text-inksoft transition-colors hover:text-foreground"
+              >
+                <Icon className="size-[16px]" />
+              </a>
+            ))}
           </div>
         </div>
       </div>

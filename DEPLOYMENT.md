@@ -48,9 +48,11 @@ Do not give the browser privileged keys and never make role assignment accessibl
   requirements and review email and authentication rate limits. Check the
   Vercel project's Supabase URL before selecting a target for the migration.
 - After deployment, verify the response headers on the real production host.
-  The enforced policy blocks embedding and plug-in objects. The stricter script
-  and resource directives only report violations in the browser console. Test
-  signup, password reset, publishing and the editor before tightening them.
+  Vercel HTML responses use an enforced script policy with a fresh nonce for
+  each response. Do not cache that HTML at Cloudflare or reuse the nonce.
+  Verify signup, password reset, publishing, the editor, and preview flows.
+  Keep Trusted Types enforcement off until the editor and article renderer
+  are compatible with it. Review DevTools Issues for any actual policy failure.
 - Public view counts are an approximate engagement metric. The guest view-count
   endpoint is still public and does not provide abuse-resistant analytics.
 
@@ -65,3 +67,15 @@ Do not give the browser privileged keys and never make role assignment accessibl
 - On the preview, check a published article's canonical URL and social
   image in View Source. Confirm that a mobile browser requests a smaller
   image variant and that the original still loads when needed.
+
+## Real-user performance monitoring
+
+1. In the Vercel project, open **Speed Insights** and select **Enable** if it
+   is not already active. Deploy or redeploy after enabling.
+2. Visit the production home page and a public article. Once the page loads,
+   check that the Speed Insights script is served successfully. The integration
+   excludes account and writing routes and groups article and profile URLs by
+   route pattern without query strings.
+3. Use **Production → Mobile** to view real-user data as visits come in. Compare
+   the same public URLs in PageSpeed Insights after deployment. The local
+   tests and the documentation's example dashboard are not production data.
