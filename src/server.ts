@@ -3,6 +3,7 @@ import "./lib/error-capture";
 import { cspNonce } from "./lib/csp-nonce.server";
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
+import { serveSitemap } from "./lib/sitemap.server";
 
 type ServerEntry = {
   fetch: (request: Request) => Promise<Response> | Response;
@@ -84,8 +85,10 @@ function csp(nonce: string) {
 export default {
   async fetch(request: Request) {
     try {
+      const { pathname, hostname } = new URL(request.url);
+      if (pathname === "/sitemap.xml") return await serveSitemap(request);
+
       const handler = await getServerEntry();
-      const hostname = new URL(request.url).hostname;
       const production = productionHosts.has(hostname);
       const protect = !import.meta.env.DEV && (production || process.env["VERCEL"] === "1");
       const nonce = protect ? crypto.randomUUID() : undefined;
