@@ -88,3 +88,17 @@ key, and the feed requests run in parallel with a bounded deadline. Do not add
 shared caching to the HTML because its CSP nonce is unique per response.
 The local font files retain their original Latin and extended glyph coverage,
 with the weight axes limited to the ranges used by the stylesheet.
+
+## Search discovery
+
+The canonical `/sitemap.xml` is generated from published Supabase rows and
+cached at the CDN for up to five minutes. Drafts, admin routes and URL
+parameters are not listed. The route needs the existing public Supabase
+configuration only. If that backend is unavailable, the endpoint returns
+503 rather than replacing the sitemap with an empty list.
+The `robots.txt` file points crawlers to the canonical sitemap.
+
+Submit `sitemap.xml` once in the Search Console property for
+`https://thefounderblogs.com/` if it has not already been submitted there.
+New articles are included automatically after publication and cache expiry.
+Search engines decide when and whether to index each article.

@@ -13,4 +13,4 @@ Allow: /
 User-agent: *
 Allow: /
 
-Sitemap: https://thefounderblogs.vercel.app/sitemap.xml
+Sitemap: https://thefounderblogs.com/sitemap.xml
